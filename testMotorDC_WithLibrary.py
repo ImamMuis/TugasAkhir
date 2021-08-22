@@ -1,6 +1,6 @@
 import time
-import motorLib
 import RPi.GPIO as GPIO
+import MotorDC_Library as motorLib
 
 try:
     while True:
