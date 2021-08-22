@@ -52,7 +52,7 @@ while True:
         namaFile = 'User.' + str(faceID) + '.' + str(count) + '.jpg'
 
         # Simpan file sampel wajah dan di crop
-        cv2.imwrite(userDir + '/'+ namaFile, abuAbu[y:y+h, x:x+w])
+        cv2.imwrite(userDir + '/' + namaFile, abuAbu[y:y+h, x:x+w])
 
     # Membuat window hasil tangkapan kamera
     cv2.imshow('Pengambilan Dataset Wajah', frame)
