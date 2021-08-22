@@ -37,7 +37,7 @@ def action(msg):
         telegram_bot.sendPhoto(chat_id, photo=open('D://1. IMAM/1. Libraries/Pictures/RaspiLogo.png', 'rb'))
 
     else:
-        telegram_bot.sendMessage(chat_id, str("Input Salah"))
+        telegram_bot.sendMessage(chat_id, str("Input Salah!"))
 
 
 telegram_bot = telepot.Bot('1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo')
