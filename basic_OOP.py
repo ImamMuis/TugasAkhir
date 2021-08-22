@@ -16,5 +16,6 @@ class ClassB(ClassA):
 
 object1 = ClassA()
 sum = object1.methodA()
+
 object2 = ClassB()
 print(sum)
