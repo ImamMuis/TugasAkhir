@@ -1,5 +1,5 @@
 # Konfigurasi Driver Servo & Motor
-V_in    = 24 #V (Tegangan untuk motor DC)
+V_in    = 24 #V (Tegangan Maksimal untuk motor DC)
 freq    = 50 #Hz (Frekuensi PWM)
 PWM_Res = 2 ** 16 - 1 #Lebar bit PWM
 

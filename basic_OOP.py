@@ -9,8 +9,6 @@ class ClassA():
         ClassA.var1 = ClassA.var1 + ClassA.var2
         return ClassA.var1
 
-
-
 class ClassB(ClassA):
     def __init__(self):
         print(ClassA.var1, "1")

@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 from board import SCL, SDA
 from adafruit_pca9685 import PCA9685
 
-# Mengatur Driver Servo berkomunikasi dengan Raspberry
+# Mengatur Driver Servo berkomunikasi dengan Raspberry Pi
 i2c_bus = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c_bus)
 

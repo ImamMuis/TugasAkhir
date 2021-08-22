@@ -43,16 +43,16 @@ while True:
 
     for x, y, w, h in faces:
         # Membuat rectangle untuk wajah
-        frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
+        frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Increment untuk sampel wajah
         count += 1
  
         # Nama file sampel wajah
-        namaFile = 'User.'+str(faceID)+'.'+str(count)+'.jpg'
+        namaFile = 'User.' + str(faceID) + '.' + str(count) + '.jpg'
 
         # Simpan file sampel wajah dan di crop
-        cv2.imwrite(userDir+'/'+namaFile, abuAbu[y:y+h,x:x+w])
+        cv2.imwrite(userDir + '/'+ namaFile, abuAbu[y:y+h, x:x+w])
 
     # Membuat window hasil tangkapan kamera
     cv2.imshow('Pengambilan Dataset Wajah', frame)

@@ -25,9 +25,6 @@ def action(msg):
                                  str("Telegram Bot Running at: \n") +
                                  str(now.strftime("Time: %I:%M %p\n")) +
                                  str(now.strftime("Day  : %a, %d - %b - %Y\n"))
-                                    # Telegram Bot Running at: 
-                                    # Time: 11:15 AM
-                                    # Day  : Thu, 19 - Aug - 2021
                                  )
 
     elif command == '/bagianRaspi':

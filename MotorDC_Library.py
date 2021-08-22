@@ -1,3 +1,4 @@
+# Library untuk Motor DC
 # Library untuk menggunakan delay
 import time
 
