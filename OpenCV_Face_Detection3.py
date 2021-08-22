@@ -1,15 +1,19 @@
 import cv2
 import datetime
+
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 cam.set(3, 400)
 cam.set(4, 225)
+
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
 count = 0
 selisih = 0
-kondisiSebelum  =  0
-kondisiSekarang =  0
+prevDetectFace  =  0
+prevDetectTime  =  0
+currentDetectFace =  0
+currentDetectTime =  0
 
 def detectFace():
     jumlahWajah = 0
@@ -24,18 +28,52 @@ def detectFace():
         jumlahWajah = str(faces.shape[0])
 
     cv2.imshow('Face Detection', frame)
+
     return jumlahWajah
 
+def timeNow():
+    # Fungsi untuk mengambil detik terkini
+    now = str(datetime.datetime.now())
+    now = round(float(now.split(":")[-1]), 3)
+
+    return now
+
 while True:
-    kondisiSekarang = int(detectFace())
+    currentDetectFace = int(detectFace())
+    currentDetectTime = timeNow()
+    selisih = abs(round(currentDetectTime - prevDetectTime, 3))
+    selisih %= 10
 
-    if kondisiSekarang == 1 and kondisiSebelum == 0:
-        print("Ada Wajah!")
-        kondisiSebelum = 1
+    if prevDetectFace == 0 and currentDetectFace == 1:
+        count += 1
+        prevDetectFace = 1
+        currentDetectTime = timeNow()
+        selisih = abs(round(currentDetectTime - prevDetectTime, 3))
+        selisih %= 10
+        
+        if selisih > 5:
+            print("Ada Wajah!\n")
+            prevDetectTime = currentDetectTime
 
-    elif kondisiSekarang == 0 and kondisiSebelum == 1:
-        print("Tidak ada Wajah!")
-        kondisiSebelum = 0
+        print("Counter deteksi ke-", count)
+        print("Waktu terdeteksi  :", currentDetectTime)
+        print("Akhir terdeteksi  :", prevDetectTime)
+        print("Selisih deteksi   :", selisih)
+        print("IF atas\n")
+
+    elif prevDetectFace == 1 and currentDetectFace == 0 and selisih > 5:
+        count += 1
+        prevDetectFace = 0
+        currentDetectTime = timeNow()
+        prevDetectTime = currentDetectTime
+        
+        print("Tidak Ada Wajah!\n")
+        print("Counter deteksi ke-", count)
+        print("Waktu terdeteksi  :", currentDetectTime)
+        print("Akhir terdeteksi  :", prevDetectTime)
+        print("Selisih deteksi   :", selisih)
+        print("IF bawah\n")
+
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
