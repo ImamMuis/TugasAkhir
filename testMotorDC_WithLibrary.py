@@ -1,15 +1,15 @@
 import time
 import RPi.GPIO as GPIO
-import MotorDC_Library as motorLib
+import MotorDC_Library as mLib
 
 try:
     while True:
-        motorLib.motorStart("FORWARD")
-        motorLib.motorStop()
+        mLib.motorStart("FORWARD")
+        mLib.motorStop()
         time.sleep(1)
         
-        motorLib.motorStart("REVERSE")
-        motorLib.motorStop()
+        mLib.motorStart("REVERSE")
+        mLib.motorStop()
         time.sleep(1)
 
 except KeyboardInterrupt:
@@ -19,5 +19,5 @@ except:
     print("Other Error or exception occured!")
 
 finally:
-    motorLib.motorStop()
+    mLib.motorStop()
     GPIO.cleanup()
