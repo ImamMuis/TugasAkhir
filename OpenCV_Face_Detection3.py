@@ -50,7 +50,7 @@ while True:
         currentDetectTime = timeNow()
         selisih = abs(round(currentDetectTime - prevDetectTime, 3))
         selisih %= 10
-        
+
         if selisih > 5:
             print("Ada Wajah!\n")
             prevDetectTime = currentDetectTime
@@ -59,7 +59,7 @@ while True:
         print("Waktu terdeteksi  :", currentDetectTime)
         print("Akhir terdeteksi  :", prevDetectTime)
         print("Selisih deteksi   :", selisih)
-        print("IF atas\n")
+        print("")
 
     elif prevDetectFace == 1 and currentDetectFace == 0 and selisih > 5:
         count += 1
@@ -72,7 +72,7 @@ while True:
         print("Waktu terdeteksi  :", currentDetectTime)
         print("Akhir terdeteksi  :", prevDetectTime)
         print("Selisih deteksi   :", selisih)
-        print("IF bawah\n")
+        print("")
 
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
