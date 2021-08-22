@@ -41,15 +41,13 @@ def timeNow():
 while True:
     currentDetectFace = int(detectFace())
     currentDetectTime = timeNow()
-    selisih = abs(round(currentDetectTime - prevDetectTime, 3))
-    selisih %= 10
+    selisih = abs(round((currentDetectTime - prevDetectTime) % 10, 3))
 
     if prevDetectFace == 0 and currentDetectFace == 1:
         count += 1
         prevDetectFace = 1
         currentDetectTime = timeNow()
-        selisih = abs(round(currentDetectTime - prevDetectTime, 3))
-        selisih %= 10
+        selisih = abs(round((currentDetectTime - prevDetectTime) % 10, 3))
 
         if selisih > 5:
             print("Ada Wajah!\n")
