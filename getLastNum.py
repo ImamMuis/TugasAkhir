@@ -1,11 +1,10 @@
-import datetime
 import time
+import datetime
 
 Time = 0
-
-def lastdigits(nums):
-	num %= 10
-	print(abs(num))
+def lastdigits(num):
+	# num %= 10
+	print(round(abs(num % 10), 3))
 
 def timeNow():
 	now = datetime.datetime.now()
@@ -18,12 +17,7 @@ def timeNow():
 def timeNow2():
 	now = str(datetime.datetime.now())
 	now = round(float(now.split(":")[-1]), 3)
+
 	return now
 
-Time = timeNow2()
-print(Time)
-
-# while True:
-# 	Time = timeNow2()
-# 	print(Time)
-	# time.sleep(0.01)
+lastdigits(123.456)
