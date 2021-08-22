@@ -91,7 +91,7 @@ def motorStop():
     # Kecepatan akhir: motorZERO (0V)
     # Nilai decrement: -15 (kecepatan turun)
     # Nilai Akselerasi: 0 (Tidak)  
-    motorSpeed(motorMAX, motorZERO, -15, 0)
+    motorSpeed(motorMAX, motorZERO, -20, 0)
 
     # GPIO diatur agar motor diam
     GPIO.output(pin_motorLogic1, 0)
