@@ -1,5 +1,5 @@
 # Library untuk Motor DC
-# Library untuk menggunakan delay
+# Library untuk delay
 import time
 
 # Library untuk menggunakan komunikasi I2C
