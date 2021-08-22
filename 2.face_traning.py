@@ -1,9 +1,7 @@
-# Import library OpenCV, OS dan numpy
+# Import library OpenCV, OS, numpy dan PIL
 import cv2
 import os
 import numpy as np
-
-# Import Python Image Library (PIL)
 from PIL import Image
 
 # File untuk mendeteksi wajah
