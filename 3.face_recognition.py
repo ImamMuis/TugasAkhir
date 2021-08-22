@@ -1,6 +1,5 @@
-# Import library OpenCV, OS dan numpy
+# Import library OpenCV dan numpy
 import cv2
-import os
 import numpy as np
 
 # Memulai Video dari webcam
