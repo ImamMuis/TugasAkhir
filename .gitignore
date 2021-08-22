@@ -1,3 +1,4 @@
 dataset/
 data_training/
 unknown_faces/
+*.xml
