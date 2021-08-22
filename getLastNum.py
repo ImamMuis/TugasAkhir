@@ -20,4 +20,10 @@ def timeNow2():
 
 	return now
 
-lastdigits(123.456)
+list1 = [1, 0, 1, 0, 1]
+list2 = [1, 0, 1, 0, 1]
+
+if (list1 == list2):
+	print("YES!")
+
+# lastdigits(123.456)
