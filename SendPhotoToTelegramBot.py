@@ -16,14 +16,14 @@ faceDetector = cv2.CascadeClassifier(cascadePath)
 
 frame = 0
 count = 0
+chat_id = 0
+command = ""
 faceState1 = False
 faceState2 = False
 TimeBetween = 0
 DetectedFace_Last =  0
 notDetectedTime_Now = 0
 notDetectedTime_Last = 0
-chat_id = 0
-command = ""
 
 def Selisih(current, prev):
 	num = current - prev
@@ -46,54 +46,57 @@ def getCurrent(data):
 
 	return value
 
+def saveImage(frame):
+	waktu = getCurrent("Date")
+	namaFile = 'DetectedFace.' + str(waktu) + '.jpg'
+	cv2.imwrite(userDir + '/' + namaFile, frame)
 
-def action(msg):
+def sendImage(chat_id):
+	lastImage = os.listdir(userDir)
+	foto = lastImage[-1]
+	file = str(userDir) + '/' + str(foto)
+	bot.sendPhoto(chat_id, photo=open(file, 'rb'))
+
+def teleBot(msg):
+	global frame
 	global chat_id
 	global command
 
 	chat_id = msg['chat']['id']
 	command = msg['text']
 
-	print('Received: %s' %command)
+	print("User from : %s" %chat_id)
+	print("Command   : %s\n" %command)
+
+	show_keyboard = {'keyboard':[	
+									['Ambil Foto','Foto Terakhir'], 
+									['null','Waktu Sekarang']
+								]}
 
 	if command == '/start':
-		# bot.sendMessage(chat_id, str("Hi Imam!"))
-		show_keyboard = {'keyboard':[	
-										['Ambil Foto','Foto Terakhir'], 
-										['null','Waktu Sekarang']
-									]}
-		bot.sendMessage(chat_id, 'Pilih perintah:', reply_markup=show_keyboard)
+		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
+
+	elif command == 'Ambil Foto':
+		saveImage(frame)
+		sendImage(chat_id)
+
+	elif command == 'Foto Terakhir':
+		sendImage(chat_id)
 
 	elif command == 'Waktu Sekarang':
 		now = datetime.datetime.now()
 		value1 = now.strftime("Time: %H:%M:%S\n")
 		value2 = now.strftime("Day : %a, %d - %b - %Y\n")
-
 		bot.sendMessage(chat_id, str(value1)+str(value2))
-
-
-	elif command == 'Foto Terakhir':
-		lastImage = os.listdir(userDir)
-		foto = lastImage[-1]
-		file = str(userDir) + '/' + str(foto)
-		bot.sendPhoto(chat_id, photo=open(file, 'rb'))
-
-	elif command == 'Ambil Foto':
-		waktu = getCurrent("Date")
-		namaFile = 'DetectedFace.' + str(waktu) + '.jpg'
-		cv2.imwrite(userDir + '/' + namaFile, frame)
-
-		lastImage = os.listdir(userDir)
-		foto = lastImage[-1]
-		file = str(userDir) + '/' + str(foto)
-		bot.sendPhoto(chat_id, photo=open(file, 'rb'))
 
 	else:
 		bot.sendMessage(chat_id, str("Input belum tersedia!"))
+		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
 def detectFace():
 	global count
 	global frame
+	global chat_id
 	global faceState1
 	global faceState2
 	global TimeBetween
@@ -101,7 +104,7 @@ def detectFace():
 	global notDetectedTime_Now
 	global notDetectedTime_Last
 	global DetectedFace_Tolerance
-	global command
+
 	jumlahWajah = 0
 
 	succes, frame = cam.read()
@@ -130,16 +133,12 @@ def detectFace():
 			print("Counter :", count)
 			print("Tanggal :", getCurrent("Date"))
 			print("")
+			
+			if chat_id == 0:
+				chat_id = 1338050139
 
-			waktu = getCurrent("Date")
-			namaFile = 'DetectedFace.' + str(waktu) + '.jpg'
-			cv2.imwrite(userDir + '/' + namaFile, frame)
-
-			lastImage = os.listdir(userDir)
-			foto = lastImage[-1]
-			file = str(userDir) + '/' + str(foto)
-			bot.sendPhoto(1338050139, photo=open(file, 'rb'))
-			# command = 'Foto Terakhir'
+			saveImage(frame)
+			sendImage(chat_id)
 
 	elif DetectedFace_Last == 1 and DetectedFace_Now == 0:
 		DetectedFace_Last = DetectedFace_Now
@@ -163,10 +162,9 @@ def detectFace():
 
 	cv2.imshow('Face Detection', frame)
 
-
 bot = telepot.Bot(tokenBot)
-bot.message_loop(action)
-print ('Up and Running....')
+bot.message_loop(teleBot)
+print ('Telegram Bot Listening...\n')
 
 try:
 	while True:
