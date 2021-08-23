@@ -1,88 +1,34 @@
-from gpiozero import Buzzer, DigitalInputDevice
+import time
+import datetime
 import telepot
-import picamera
+# from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
-sensor = DigitalInputDevice(17, pull_up=True)
-buzzer = Buzzer(26)
+def action(msg):
+    chat_id = msg['chat']['id']
+    command = msg['text']
+    print('Received: %s' %command)
 
-def handle(msg):
-	global telegramText
-	global chat_id
-	global receiveTelegramMessage
+    if command == '/start':
+        telegram_bot.sendMessage(chat_id, str("Hi Imam!"))
 
-	chat_id = msg['chat']['id']
-	telegramText = msg['text']
+	# value = waktu.strftime("%Y%m%d.%H%M%S")
+    elif command == '/time':
+    	now = datetime.datetime.now()
+    	value1 = now.strftime("Time: %H:%M:%S\n")
+    	value2 = now.strftime("Day : %a, %d - %b - %Y\n")
 
-	print("Message received from " + str(chat_id))
+    	telegram_bot.sendMessage(chat_id, str(value1)+str(value2))
 
-	if telegramText == "/start":
-		bot.sendMessage(chat_id, "Welcome to Idris Bot")
+    elif command == '/lastPhoto':
+        telegram_bot.sendPhoto(chat_id, photo=open('unknown_faces/DetectedFace.20210823.125956.jpg', 'rb'))
 
-	else:
-		buzzer.beep(0.1, 0.1, 1)
-		receiveTelegramMessage = True
- 
-def capture():
-	print("Capturing photo…")
-	camera = picamera.PiCamera()
-	camera.capture('./photo.jpg')
-	camera.close()
-	print("Sending photo to " + str(chat_id))
-	bot.sendPhoto(chat_id, photo = open('./photo.jpg', 'rb'))
- 
-def sensorTrigger():
-	global statusText
-	global sendTelegramMessage
-	global cameraEnable
-	global sendPhoto
-	statusText = "Sensor is triggered!"
-	sendTelegramMessage = True
-	if cameraEnable == True:
-		sendPhoto = True
-		buzzer.beep(0.1, 0.1, 1)
-
-bot = telepot.Bot('1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo')
-bot.message_loop(handle)
+    else:
+        telegram_bot.sendMessage(chat_id, str("Input Salah!"))
 
 
-statusText = ""
-sendPhoto = False
-cameraEnable = False
-sendTelegramMessage = False
-receiveTelegramMessage = False
-sensor.when_deactivated = sensorTrigger
+telegram_bot = telepot.Bot('1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo')
+telegram_bot.message_loop(action)
+print ('Up and Running....')
 
-print("Telegram bot is ready")
-buzzer.beep(0.1, 0.1, 2)
-
-try:
-	while True:
-		if receiveTelegramMessage == True:
-			receiveTelegramMessage = False
-
-			statusText = ""
-
-		if telegramText == "ENABLE":
-			cameraEnable = True
-			statusText = "Camera is enabled"
-
-		elif telegramText == "PHOTO":
-			sendPhoto = True
-			statusText = "Capturing photo…"
-
-		else:
-			statusText = "Command is not valid"
-
-		sendTelegramMessage = True
-
-		if sendTelegramMessage == True:
-			sendTelegramMessage = False
-			bot.sendMessage(chat_id, statusText)
-
-		if cameraEnable == True and sendPhoto == True:
-			cameraEnable = False
-			sendPhoto = False
-			capture()
-			
-except KeyboardInterrupt:
-	sys.exit(0)
+while 1:
+    time.sleep(10)
