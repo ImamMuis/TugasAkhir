@@ -11,11 +11,12 @@ count = 0
 faceState1 = False
 faceState2 = False
 
-DetectedFace_Last  =  0
+DetectedFace_Last =  0
 notDetectedTime_Now = 0
 notDetectedTime_Last = 0
 
 DetectedFace_Tolerance = 5
+
 def detectFace():
     jumlahWajah = 0
 
@@ -26,33 +27,21 @@ def detectFace():
 
     for x, y, w, h in faces:
         frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        jumlahWajah = str(faces.shape[0])
+        jumlahWajah = int(str(faces.shape[0]))
     cv2.imshow('Face Detection', frame)
 
     return jumlahWajah
 
-def getCurrent(data):
-    now = datetime.datetime.now()
-    if data == "Date":
-        value = now.strftime("%Y-%m-%d %H:%M:%S")
+def faceResult():
+    global count
+    global faceState1
+    global faceState2
+    global DetectedFace_Last
+    global notDetectedTime_Now
+    global notDetectedTime_Last
 
-    elif data == "Time":
-        value = round(float(str(now).split(":")[-1]), 3)
-
-    else:
-        print("WRONG PARAMETER!")
-
-    return value
-
-def Selisih(current, prev):
-    num = current - prev
-
-    num = round( abs(num) % 10, 3)
-
-    return num
-
-while True:
-    DetectedFace_Now = int(detectFace())
+    DetectedFace_Tolerance = 5
+    DetectedFace_Now = detectFace()
 
     if DetectedFace_Last == 0 and DetectedFace_Now == 1:
         DetectedFace_Last = DetectedFace_Now
@@ -84,6 +73,28 @@ while True:
         if TimeBetween > DetectedFace_Tolerance and faceState2 == True:
             print("Tidak Ada Wajah!\n")
             faceState2 = False
+
+def getCurrent(data):
+    now = datetime.datetime.now()
+    if data == "Date":
+        value = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    elif data == "Time":
+        value = round(float(str(now).split(":")[-1]), 3)
+
+    else:
+        print("WRONG PARAMETER!")
+
+    return value
+
+def Selisih(current, prev):
+    num = current - prev
+    num = round( abs(num) % 10, 3)
+
+    return num
+
+while True:
+    faceResult()
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
