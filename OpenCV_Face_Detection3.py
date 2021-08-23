@@ -2,8 +2,11 @@ import cv2
 import datetime
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
 cam.set(3, 400)
 cam.set(4, 225)
+DetectedFace_Tolerance = 5
+
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
@@ -15,7 +18,26 @@ DetectedFace_Last =  0
 notDetectedTime_Now = 0
 notDetectedTime_Last = 0
 
-DetectedFace_Tolerance = 5
+def getCurrent(data):
+    now = datetime.datetime.now()
+    if data == "Date":
+        value = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    elif data == "Time":
+        value = round(float(str(now).split(":")[-1]), 3)
+
+    else:
+        print("WRONG PARAMETER!")
+
+    return value
+
+def Selisih(current, prev):
+    num = current - prev
+    if num < 0:
+        num += 60
+    num = round(num, 3)
+
+    return num
 
 def detectFace():
     global count
@@ -71,33 +93,12 @@ def detectFace():
             TimeBetween = Selisih(notDetectedTime_Last, notDetectedTime_Now)
 
         # print(TimeBetween)
-        
+
         if TimeBetween > DetectedFace_Tolerance and faceState2 == True:
             print("Tidak Ada Wajah!\n")
             faceState2 = False
 
     cv2.imshow('Face Detection', frame)
-
-def getCurrent(data):
-    now = datetime.datetime.now()
-    if data == "Date":
-        value = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    elif data == "Time":
-        value = round(float(str(now).split(":")[-1]), 3)
-
-    else:
-        print("WRONG PARAMETER!")
-
-    return value
-
-def Selisih(current, prev):
-    num = current - prev
-    if num < 0:
-        num += 60
-    num = round(num, 3)
-
-    return num
 
 while True:
     detectFace()
