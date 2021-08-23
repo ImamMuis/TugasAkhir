@@ -10,6 +10,7 @@ cam.set(4, 225)
 DetectedFace_Tolerance = 5
 userDir = 'unknown_faces'
 
+teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
@@ -17,6 +18,8 @@ faceDetector = cv2.CascadeClassifier(cascadePath)
 frame = 0
 count = 0
 chat_id = 0
+quit = False
+quitFlag = False
 faceState1 = False
 faceState2 = False
 TimeBetween = 0
@@ -34,10 +37,16 @@ def Selisih(current, prev):
 
 def getCurrent(data):
 	now = datetime.datetime.now()
-	if data == "Date":
+	if data == "DATE":
+		value = now.strftime("%a, %d - %b - %Y")
+
+	elif data == "Date":
 		value = now.strftime("%Y%m%d.%H%M%S")
 
 	elif data == "Time":
+		value = now.strftime("%H:%M:%S")
+
+	elif data == "second":
 		value = round(float(str(now).split(":")[-1]), 3)
 
 	else:
@@ -57,20 +66,22 @@ def sendImage(chat_id):
 	bot.sendPhoto(chat_id, photo=open(file, 'rb'))
 
 def teleBot(msg):
+	global quit
 	global frame
 	global chat_id
+	global command
+	global quitFlag
+	global teleBot_PWD
 
 	chat_id = msg['chat']['id']
 	command = msg['text']
 
-	print("User from : %s" %chat_id)
+	print("From User : %s" %chat_id)
 	print("Command   : %s\n" %command)
 
-	show_keyboard = {'keyboard':[   
-									['Ambil Foto','Foto Terakhir'], 
-									['null','Waktu Sekarang']
-								]}
-
+	show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
+							 		['Waktu Sekarang','Stop Bot ']
+							]}
 	if command == '/start':
 		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
@@ -86,6 +97,18 @@ def teleBot(msg):
 		value1 = now.strftime("Time: %H:%M:%S\n")
 		value2 = now.strftime("Day : %a, %d - %b - %Y\n")
 		bot.sendMessage(chat_id, str(value1)+str(value2))
+
+	elif command == 'Stop Bot':
+		bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+		quitFlag = True
+
+	elif command == teleBot_PWD:
+		bot.sendMessage(chat_id, str('Bot Telegram terhenti...'))
+		quit = True
+
+	elif command != teleBot_PWD and quitFlag == True:
+		bot.sendMessage(chat_id, str('Password Salah!'))
+		quitFlag = False
 
 	else:
 		bot.sendMessage(chat_id, str("Input belum tersedia!"))
@@ -118,7 +141,7 @@ def detectFace():
 
 	if DetectedFace_Last == 0 and DetectedFace_Now == 1:
 		DetectedFace_Last = DetectedFace_Now
-		DetectedTime_Now = getCurrent("Time")
+		DetectedTime_Now = getCurrent("second")
 		TimeBetween = Selisih(DetectedTime_Now, notDetectedTime_Now)
 
 		# print(TimeBetween)
@@ -128,8 +151,9 @@ def detectFace():
 			count += 1
 			faceState1 = True
 			faceState2 = True
-			print("Counter :", count)
-			print("Tanggal :", getCurrent("Date"))
+			print("Deteksi ke	 :", count)
+			print("Hari, Tanggal :", getCurrent("DATE"))
+			print("Jam           :", getCurrent("Time"))
 			print("")
 			
 			if chat_id == 0:
@@ -137,25 +161,28 @@ def detectFace():
 
 			saveImage(frame)
 			sendImage(chat_id)
+			bot.sendMessage(chat_id, str("Wajah Terdeteksi!"))
 
 	elif DetectedFace_Last == 1 and DetectedFace_Now == 0:
 		DetectedFace_Last = DetectedFace_Now
-		notDetectedTime_Now = getCurrent("Time")
+		notDetectedTime_Now = getCurrent("second")
 
 	elif DetectedFace_Last == 0 and DetectedFace_Now == 0:
 
 		if faceState1 == True:
-			notDetectedTime_Now = getCurrent("Time")
+			notDetectedTime_Now = getCurrent("second")
 			faceState1 = False
 
 		if count != 0 and faceState2 == True:
-			notDetectedTime_Last = getCurrent("Time")
+			notDetectedTime_Last = getCurrent("second")
 			TimeBetween = Selisih(notDetectedTime_Last, notDetectedTime_Now)
 
 		# print(TimeBetween)
 
 		if TimeBetween > DetectedFace_Tolerance and faceState2 == True:
 			print("Tidak Ada Wajah!\n")
+			msg = 'Tidak ada wajah  terdeteksi dalam 5 detik terakhir'
+			bot.sendMessage(chat_id, str(msg))
 			faceState2 = False
 
 	cv2.imshow('Face Detection', frame)
@@ -168,7 +195,7 @@ try:
 	while True:
 		detectFace()
 
-		if cv2.waitKey(1) & 0xFF == ord('q'):
+		if cv2.waitKey(1) & 0xFF == ord('q') or quit == True:
 			break
 
 	cam.release()
