@@ -23,8 +23,8 @@ def action(msg):
     elif command == '/time':
         telegram_bot.sendMessage(chat_id,
                                  str("Telegram Bot Running at: \n") +
-                                 str(now.strftime("Time: %I:%M %p\n")) +
-                                 str(now.strftime("Day  : %a, %d - %b - %Y\n"))
+                                 str(now.strftime("Time: %H:%M \n")) +
+                                 str(now.strftime("Day  : %a, %d - %b - %Y \n"))
                                  )
 
     elif command == '/bagianRaspi':
