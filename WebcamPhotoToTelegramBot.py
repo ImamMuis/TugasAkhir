@@ -4,13 +4,13 @@ import telepot
 import datetime
 
 
-ipv4_url = 'http://192.168.43.1:8080'
-cam = f'{ipv4_url}/video'
-cam = cv2.VideoCapture(cam)
+# ipv4_url = 'http://192.168.43.1:8080'
+# cam = f'{ipv4_url}/video'
+# cam = cv2.VideoCapture(cam)
 
-# cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-# cam.set(3, 400)
-# cam.set(4, 225)
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cam.set(3, 400)
+cam.set(4, 225)
 
 DetectedFace_Tolerance = 5
 userDir = 'unknown_faces'
@@ -117,7 +117,7 @@ def teleBot(msg):
 
 	else:
 		bot.sendMessage(chat_id, str("Input belum tersedia!"))
-		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
+		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) 
 
 def detectFace():
 	global count
