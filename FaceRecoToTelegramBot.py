@@ -37,7 +37,7 @@ quitFlag = False
 faceState1 = False
 faceState2 = False
 TimeBetween = 0
-DetectedFace_Last =  0
+DetectedFace_Last =  ""
 notDetectedTime_Now = 0
 notDetectedTime_Last = 0
 
@@ -126,17 +126,29 @@ def teleBot(msg):
 
 	else:
 		bot.sendMessage(chat_id, str("Input belum tersedia!"))
-		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) @
+		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
 def faceReco():
-	global powerFactor
+	global count
+	global frame
+	global chat_id
+	global faceState1
+	global faceState2
+	global TimeBetween
+	global DetectedFace_Last
+	global notDetectedTime_Now
+	global notDetectedTime_Last
+	global DetectedFace_Tolerance
+
+	nameID = ""
+
 	succes, frame = cam.read()
 	frame = cv2.flip(frame, 1)
 	frame = cv2.resize(frame, (360, 270))
 	abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	faces  = faceDetector.detectMultiScale(abuAbu, 1.3, 5)
 
-	for x,y,w,h in faces:
+	for x, y, w, h in faces:
 		frame = cv2.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
 		Id, confidence = faceRecognizer.predict(abuAbu[y:y+h, x:x+w])
 
@@ -153,7 +165,59 @@ def faceReco():
 		cv2.putText(frame, str(nameID), (x,y-5), font, 0.9, (255, 255, 255), 2)
 		cv2.putText(frame, str(confidenceTxt), (x+w-60, y+h-5), font, 0.7, (255, 255, 0), 2)
 
+	DetectedFace_Now = nameID
+
+	if DetectedFace_Last == "" and DetectedFace_Now == names[0]:
+		DetectedFace_Last = DetectedFace_Now
+		DetectedTime_Now = getCurrent("second")
+		TimeBetween = Selisih(DetectedTime_Now, notDetectedTime_Now)
+
+		# print(TimeBetween)
+
+		if TimeBetween > DetectedFace_Tolerance or count == 0:
+			print("Wajah tidak dikenal!\n")
+			count += 1
+			faceState1 = True
+			faceState2 = True
+			print("Deteksi ke	 :", count)
+			print("Hari, Tanggal :", getCurrent("DATE"))
+			print("Jam           :", getCurrent("Time"))
+			print("")
+			
+			if chat_id == 0:
+				chat_id = 1338050139
+
+			saveImage(frame)
+			sendImage(chat_id)
+			bot.sendMessage(chat_id, str("Wajah Terdeteksi!"))
+
+	elif DetectedFace_Last == names[0] and DetectedFace_Now == "":
+		DetectedFace_Last = DetectedFace_Now
+		notDetectedTime_Now = getCurrent("second")
+
+	elif DetectedFace_Last == "" and DetectedFace_Now == "":
+
+		if faceState1 == True:
+			notDetectedTime_Now = getCurrent("second")
+			faceState1 = False
+
+		if count != 0 and faceState2 == True:
+			notDetectedTime_Last = getCurrent("second")
+			TimeBetween = Selisih(notDetectedTime_Last, notDetectedTime_Now)
+
+		# print(TimeBetween)
+
+		if TimeBetween > DetectedFace_Tolerance and faceState2 == True:
+			print("Tidak Ada Wajah!\n")
+			msg = 'Tidak ada wajah  terdeteksi dalam 5 detik terakhir'
+			bot.sendMessage(chat_id, str(msg))
+			faceState2 = False
+
 	cv2.imshow('Face Recognition', frame)
+
+bot = telepot.Bot(tokenBot)
+bot.message_loop(teleBot)
+print ('Telegram Bot Listening...\n')
 
 try:
 	while True:
