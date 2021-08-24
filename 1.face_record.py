@@ -1,8 +1,13 @@
 # Import library OpenCV
+import os
 import cv2
 
+ipv4_url = 'http://192.168.43.1:8080'
+cam = f'{ipv4_url}/video'
+cam = cv2.VideoCapture(cam)
+
 # Memulai Video dari webcam
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+# cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
  # Mengatur ukuran lebar video ke 720 pixel
 cam.set(3, 720)
@@ -23,9 +28,8 @@ faceSample = 200
 # Nama folder sampel wajah
 userDir = 'dataset'
 
-
 # counter sampel wajah
-count   = 1
+count = 0
 count2 = 0
 
 faceIDFlag = True
