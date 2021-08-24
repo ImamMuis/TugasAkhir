@@ -96,6 +96,7 @@ def teleBot(msg):
 	show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
 									['Waktu Sekarang','Stop Bot ']
 							]}
+							
 	if command == '/start':
 		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
