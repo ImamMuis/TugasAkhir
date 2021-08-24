@@ -39,63 +39,63 @@ GPIO.setup(pin_motorLogic2, GPIO.OUT)
 # FORWARD: Buka Pintu
 # REVERSE: Tutup Pintu
 def motorStart(mode):
-    
-    # Print untuk mengetahui perintah yang akan dieksekusi
-    print("Motor Start")
+	
+	# Print untuk mengetahui perintah yang akan dieksekusi
+	print("Motor Start")
 
-    # Jika parameter 'moode' diisi FORWARD, maka
-    # Pin arah rotasi motor diatur menjadi 1 dan 0
-    if mode == "FORWARD":
-        print("Mode: Forward\n")
+	# Jika parameter 'moode' diisi FORWARD, maka
+	# Pin arah rotasi motor diatur menjadi 1 dan 0
+	if mode == "FORWARD":
+		print("Mode: Forward\n")
 
-        # GPIO diatur agar motor berputar FORWARD
-        GPIO.output(pin_motorLogic1, 1)
-        GPIO.output(pin_motorLogic2, 0)
+		# GPIO diatur agar motor berputar FORWARD
+		GPIO.output(pin_motorLogic1, 1)
+		GPIO.output(pin_motorLogic2, 0)
 
-        # Motor bergerak dengan parameter:
-        # Kecepatan awal: motorMIN (2V)
-        # Kecepatan akhir: motorMAX (24V)
-        # Nilai increment: 4 (kecepatan naik)
-        # Nilai Akselerasi: 1 (Ya)
-        motorSpeed(motorMIN, motorMAX, 4, 1)
-    
+		# Motor bergerak dengan parameter:
+		# Kecepatan awal: motorMIN (2V)
+		# Kecepatan akhir: motorMAX (24V)
+		# Nilai increment: 4 (kecepatan naik)
+		# Nilai Akselerasi: 1 (Ya)
+		motorSpeed(motorMIN, motorMAX, 4, 1)
+	
 
-    # Jika parameter 'moode' diisi REVERSE, maka
-    # Pin arah rotasi motor diatur menjadi 0 dan 1
-    elif mode == "REVERSE":
-        print("Mode: Reverse\n")
+	# Jika parameter 'moode' diisi REVERSE, maka
+	# Pin arah rotasi motor diatur menjadi 0 dan 1
+	elif mode == "REVERSE":
+		print("Mode: Reverse\n")
 
-        # GPIO diatur agar motor berputar REVERSE
-        GPIO.output(pin_motorLogic1, 0)
-        GPIO.output(pin_motorLogic2, 1)
+		# GPIO diatur agar motor berputar REVERSE
+		GPIO.output(pin_motorLogic1, 0)
+		GPIO.output(pin_motorLogic2, 1)
 
-        # Motor bergerak dengan parameter:
-        # Kecepatan awal: motorMIN (2V)
-        # Kecepatan akhir: motorMAX (24V)
-        # Nilai increment: 4 (kecepatan naik)
-        # Nilai Akselerasi: 1 (Ya)
-        motorSpeed(motorMIN, motorMAX, 4, 1)
+		# Motor bergerak dengan parameter:
+		# Kecepatan awal: motorMIN (2V)
+		# Kecepatan akhir: motorMAX (24V)
+		# Nilai increment: 4 (kecepatan naik)
+		# Nilai Akselerasi: 1 (Ya)
+		motorSpeed(motorMIN, motorMAX, 4, 1)
 
-    # Kondisi jika parameter 'mode' tidak diisi FORWARD ataupun REVERSE
-    else:
-        print("Parameter 'mode' harus FORWARD atau REVERSE!\n")
+	# Kondisi jika parameter 'mode' tidak diisi FORWARD ataupun REVERSE
+	else:
+		print("Parameter 'mode' harus FORWARD atau REVERSE!\n")
 
 # Fungsi untuk menghentikan motor
 def motorStop():
 
-    # Print untuk mengetahui perintah yang akan dieksekusi
-    print("Motor Stop\n")
+	# Print untuk mengetahui perintah yang akan dieksekusi
+	print("Motor Stop\n")
 
-    # Motor bergerak dengan parameter:
-    # Kecepatan awal: motorMAX (24V)
-    # Kecepatan akhir: motorZERO (0V)
-    # Nilai decrement: -15 (kecepatan turun)
-    # Nilai Akselerasi: 0 (Tidak)  
-    motorSpeed(motorMAX, motorZERO, -20, 0)
+	# Motor bergerak dengan parameter:
+	# Kecepatan awal: motorMAX (24V)
+	# Kecepatan akhir: motorZERO (0V)
+	# Nilai decrement: -15 (kecepatan turun)
+	# Nilai Akselerasi: 0 (Tidak)  
+	motorSpeed(motorMAX, motorZERO, -20, 0)
 
-    # GPIO diatur agar motor diam
-    GPIO.output(pin_motorLogic1, 0)
-    GPIO.output(pin_motorLogic2, 0)
+	# GPIO diatur agar motor diam
+	GPIO.output(pin_motorLogic1, 0)
+	GPIO.output(pin_motorLogic2, 0)
 
 # Fungsi untuk mengeksekusi perputaran motor dengan Parameter:
 # begin: Kecepatan awal motor
@@ -104,53 +104,53 @@ def motorStop():
 # accel: Nilai Akselerasi
 def motorSpeed(begin, end, step, accel):
 
-    # Jika parameter akselerasi bernilai 1, maka
-    # Motor diinisiasi dengan nilai PWM 13653 (5V) 
-    if accel == 1:
-        # Channel PWM 2 pada Driver Servo
-        # mengeluarkan nilai PWM sebesar 13653
-        # atau Duty Cycle 20,83% dari nilai max 65535 
-        pca.channels[motorPWM_Channel].duty_cycle = 13653
+	# Jika parameter akselerasi bernilai 1, maka
+	# Motor diinisiasi dengan nilai PWM 13653 (5V) 
+	if accel == 1:
+		# Channel PWM 2 pada Driver Servo
+		# mengeluarkan nilai PWM sebesar 13653
+		# atau Duty Cycle 20,83% dari nilai max 65535 
+		pca.channels[motorPWM_Channel].duty_cycle = 13653
 
-        # Delay 20ms
-        time.sleep(0.02)
+		# Delay 20ms
+		time.sleep(0.02)
 
-    # Perulangan untuk perubahan kecepatan motor
-    for i in range(begin, end, step):
-        pca.channels[motorPWM_Channel].duty_cycle = i
-        
+	# Perulangan untuk perubahan kecepatan motor
+	for i in range(begin, end, step):
+		pca.channels[motorPWM_Channel].duty_cycle = i
+		
 try:
 
-    # Perulangan While akan terus dieksekusi (infinite)
-    # karena kondisi selau benar (True)
-    while True:
+	# Perulangan While akan terus dieksekusi (infinite)
+	# karena kondisi selau benar (True)
+	while True:
 
-        # Memanggil Fungsi motorStart dengan parameter FORWARD
-        # agar motor membuka pintu
-        motorStart("FORWARD")
+		# Memanggil Fungsi motorStart dengan parameter FORWARD
+		# agar motor membuka pintu
+		motorStart("FORWARD")
 
-        # Memanggil Fungsi motorStop agar motor berhenti
-        motorStop()
+		# Memanggil Fungsi motorStop agar motor berhenti
+		motorStop()
 
-        # Delay 1 detik
-        time.sleep(1)
-        
-        # Memanggil Fungsi motorStart dengan parameter REVERSE
-        # agar motor menutup pintu
-        motorStart("REVERSE")
+		# Delay 1 detik
+		time.sleep(1)
+		
+		# Memanggil Fungsi motorStart dengan parameter REVERSE
+		# agar motor menutup pintu
+		motorStart("REVERSE")
 
-        # Memanggil Fungsi motorStop agar motor berhenti
-        motorStop()
+		# Memanggil Fungsi motorStop agar motor berhenti
+		motorStop()
 
-        # Delay 1 detik
-        time.sleep(1)
+		# Delay 1 detik
+		time.sleep(1)
 
 except KeyboardInterrupt:
-    print("Program Stop")
+	print("Program Stop")
 
 except:
-    print("Other Error or exception occured!")
+	print("Other Error or exception occured!")
 
 finally:
-    motorStop()
-    GPIO.cleanup()
+	motorStop()
+	GPIO.cleanup()

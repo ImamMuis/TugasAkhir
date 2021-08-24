@@ -38,17 +38,17 @@ import datetime
 # 		return 
 
 def getCurrent(data):
-    now = datetime.datetime.now()
-    if data == "Date":
-	    value = now.strftime("%Y-%m-%d %H:%M:%S")
+	now = datetime.datetime.now()
+	if data == "Date":
+		value = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    elif data == "Time":
-	    value = round(float(str(now).split(":")[-1]), 3)
+	elif data == "Time":
+		value = round(float(str(now).split(":")[-1]), 3)
 
-    else:
-        print("WRONG PARAMETER!")
+	else:
+		print("WRONG PARAMETER!")
 
-    return value
+	return value
 
 tanggal = getCurrent("Date")
 waktu = getCurrent("Time")

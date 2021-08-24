@@ -3,10 +3,15 @@ import cv2
 import telepot
 import datetime
 
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-cam.set(3, 400)
-cam.set(4, 225)
+ipv4_url = 'http://192.168.43.1:8080'
+cam = f'{ipv4_url}/video'
+cam = cv2.VideoCapture(cam)
+
+# cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+# cam.set(3, 400)
+# cam.set(4, 225)
+
 DetectedFace_Tolerance = 5
 userDir = 'unknown_faces'
 
@@ -80,7 +85,7 @@ def teleBot(msg):
 	print("Command   : %s\n" %command)
 
 	show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
-							 		['Waktu Sekarang','Stop Bot ']
+									['Waktu Sekarang','Stop Bot ']
 							]}
 	if command == '/start':
 		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
@@ -130,6 +135,7 @@ def detectFace():
 
 	succes, frame = cam.read()
 	frame = cv2.flip(frame, 1)
+	frame = cv2.resize(frame, (360, 270))
 	abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	faces = faceDetector.detectMultiScale(abuAbu, 1.3 , 5)
 

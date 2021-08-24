@@ -14,15 +14,15 @@ cam.set(4, 225)
 # Start perulangan menggunakan while
 while True:
 
-    # Memulai membaca video
-    succes, frame = cam.read()
+	# Memulai membaca video
+	succes, frame = cam.read()
 
-    # Membuat window hasil tangkapan kamera
-    cv2.imshow('Face Detection', frame)
+	# Membuat window hasil tangkapan kamera
+	cv2.imshow('Face Detection', frame)
 	
-    # Tekan q untuk stop window
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+	# Tekan q untuk stop window
+	if cv2.waitKey(1) & 0xFF == ord('q'):
+		break
 
 # Stop hasil tangkapan kamera
 cam.release()
