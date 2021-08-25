@@ -1,4 +1,5 @@
 dataset/
 img_record/
 unknown_faces/
+haarcascade_frontalface_default.xml
 .idea/
