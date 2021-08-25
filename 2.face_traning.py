@@ -56,7 +56,6 @@ def getImagesLabel(path):
 # 2 variabel untuk traning pengelanan wajah 
 # dari hasil return fungsi getImagesLabel
 faces, IDs = getImagesLabel(userDir)
-print("Done!")
 
 # Training data wajah
 faceRecognizer.train(faces, np.array(IDs))
