@@ -3,23 +3,28 @@ import cv2
 import telepot
 import datetime
 
+names = ['Unknown','Imam', 'Imam2', 'Imam3']
 
-# ipv4_url = 'http://192.168.43.1:8080'
-# cam = f'{ipv4_url}/video'
-# cam = cv2.VideoCapture(cam)
+DetectedFace_Max = 30
+DetectedFace_Tolerance = 5
+
+userDir = 'unknown_faces'
+teleBot_PWD = '201802014'
+tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 cam.set(3, 400)
 cam.set(4, 225)
 
-DetectedFace_Tolerance = 5
-userDir = 'unknown_faces'
+font = cv2.FONT_HERSHEY_SIMPLEX
 
-teleBot_PWD = '201802014'
-tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
+faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
+faceRecognizer.read('data_training/trainer.xml')
+
+Id = 0
 frame = 0
 count = 0
 chat_id = 0
@@ -31,6 +36,10 @@ TimeBetween = 0
 DetectedFace_Last =  0
 notDetectedTime_Now = 0
 notDetectedTime_Last = 0
+
+totalUser = len(names)
+countID = [0] * totalUser
+detectResult = [None] * DetectedFace_Max
 
 def Selisih(current, prev):
 	num = current - prev
@@ -142,6 +151,20 @@ def detectFace():
 	for x, y, w, h in faces:
 		frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 		jumlahWajah = int(str(faces.shape[0]))
+		Id, confidence = faceRecognizer.predict(abuAbu[y:y+h,x:x+w])
+
+		if confidence >= 20 and confidence <= 100:
+			nameID = names[Id]
+			confidenceTxt = " {0}%".format(round(confidence))
+
+		else:
+			nameID = names[0]
+			confidenceTxt = " {0}%".format(round(100-confidence))
+
+		cv2.putText(frame, str(nameID), (x, y-5), font, 0.9, (255, 255, 255), 2)
+		cv2.putText(frame, str(confidenceTxt), (x+w-60, y+h-5), font, 0.7, (255, 255, 0), 2)
+
+	cv2.imshow('Face Recognition', frame)
 
 	DetectedFace_Now = jumlahWajah
 
@@ -149,8 +172,6 @@ def detectFace():
 		DetectedFace_Last = DetectedFace_Now
 		DetectedTime_Now = getCurrent("second")
 		TimeBetween = Selisih(DetectedTime_Now, notDetectedTime_Now)
-
-		# print(TimeBetween)
 
 		if TimeBetween > DetectedFace_Tolerance or count == 0:
 			print("Wajah Terdeteksi!\n")
@@ -183,15 +204,11 @@ def detectFace():
 			notDetectedTime_Last = getCurrent("second")
 			TimeBetween = Selisih(notDetectedTime_Last, notDetectedTime_Now)
 
-		# print(TimeBetween)
-
 		if TimeBetween > DetectedFace_Tolerance and faceState2 == True:
 			print("Tidak Ada Wajah!\n")
 			msg = 'Tidak ada wajah  terdeteksi dalam 5 detik terakhir'
 			bot.sendMessage(chat_id, str(msg))
 			faceState2 = False
-
-	cv2.imshow('Face Detection', frame)
 
 bot = telepot.Bot(tokenBot)
 bot.message_loop(teleBot)

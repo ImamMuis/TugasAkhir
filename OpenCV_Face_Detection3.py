@@ -40,7 +40,7 @@ def Selisih(current, prev):
 	return num
 
 def detectFace():
-	global count
+	count = 0
 	global faceState1
 	global faceState2
 	global TimeBetween
