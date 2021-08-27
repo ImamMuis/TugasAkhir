@@ -1,4 +1,6 @@
 dataset/
+dataset2/
+noDev/
 img_record/
 unknown_faces/
 haarcascade_frontalface_default.xml
