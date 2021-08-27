@@ -2,12 +2,12 @@
 import os
 import cv2
 
-ipv4_url = 'http://192.168.43.1:8080'
-cam = f'{ipv4_url}/video'
-cam = cv2.VideoCapture(cam)
+# ipv4_url = 'http://192.168.43.1:8080'
+# cam = f'{ipv4_url}/video'
+# cam = cv2.VideoCapture(cam)
 
 # Memulai Video dari webcam
-# cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
  # Mengatur ukuran lebar video ke 720 pixel
 cam.set(3, 720)
@@ -21,7 +21,7 @@ cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
 # Penomoran Wajah, satu id untuk satu orang
-faceID  = 3
+faceID  = 2
 
 faceSample = 200
 
@@ -65,6 +65,7 @@ while True:
 	# Flip video
 	frame  = cv2.flip(frame, 1)
 
+	frame = cv2.resize(frame, (533, 400))
 	# Konversi gambar ke abu-abu
 	abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
