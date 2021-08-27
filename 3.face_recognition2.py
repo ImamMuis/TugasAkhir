@@ -4,9 +4,9 @@ import telepot
 import datetime
 import numpy as np
 
-names = ['Unknown', 'Imam']
+names = ['Unknown', 'Imam', 'Iis']
 
-faceCompare = 5
+faceCompare = 20
 DetectedFace_Tolerance = 5
 
 userDir = 'img_record'
@@ -14,8 +14,16 @@ teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cam.set(3, 720)
-cam.set(4, 360)
+
+width1 = 480
+height1 = 360
+
+width2 = 220
+height2 = 165
+
+scale = width1 / width2
+cam.set(3, width1)
+cam.set(4, height1)
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -26,7 +34,7 @@ faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
 faceRecognizer.read('data_training/trainer.xml')
 
 Id = 0
-frame = 0
+imgRGB = 0
 count1 = 0
 count2 = 0
 chat_id = 0
@@ -72,10 +80,10 @@ def getCurrent(data):
 
 	return value
 
-def saveImage(frame):
+def saveImage(imgRGB):
 	waktu = getCurrent("Date")
 	namaFile = 'Snapshot.' + str(waktu) + '.jpg'
-	cv2.imwrite(userDir + '/' + namaFile, frame)
+	cv2.imwrite(userDir + '/' + namaFile, imgRGB)
 
 def sendImage(chat_id):
 	lastImage = os.listdir(userDir)
@@ -85,7 +93,7 @@ def sendImage(chat_id):
 
 def teleBot(msg):
 	global quit
-	global frame
+	global imgRGB
 	global chat_id
 	global command
 	global quitFlag
@@ -98,13 +106,13 @@ def teleBot(msg):
 	print("Command   : %s\n" %command)
 
 	show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
-									['Waktu Sekarang','Stop Bot ']
+									['Waktu Sekarang','Stop Sistem ']
 							]}
 	if command == '/start':
 		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
 	elif command == 'Ambil Foto':
-		saveImage(frame)
+		saveImage(imgRGB)
 		sendImage(chat_id)
 
 	elif command == 'Foto Terakhir':
@@ -116,12 +124,12 @@ def teleBot(msg):
 		value2 = now.strftime("Day : %a, %d - %b - %Y\n")
 		bot.sendMessage(chat_id, str(value1)+str(value2))
 
-	elif command == 'Stop Bot':
+	elif command == 'Stop Sistem':
 		bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
 		quitFlag = True
 
 	elif command == teleBot_PWD:
-		bot.sendMessage(chat_id, str('Bot Telegram terhenti...'))
+		bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
 		quit = True
 
 	elif command != teleBot_PWD and quitFlag == True:
@@ -135,7 +143,7 @@ def teleBot(msg):
 def detectFace():
 	global count1
 	global count2
-	global frame
+	global imgRGB
 	global chat_id
 	global faceState1
 	global faceState2
@@ -147,36 +155,53 @@ def detectFace():
 	global faceResult_Last
 	global faceResult_Now
 
+	size = [75, 85]
 	jumlahWajah = 0
+	idealSize = False
 
 	succes, frame = cam.read()
-	frame = cv2.flip(frame, 1)
-	frame = cv2.resize(frame, (360, 270))
-	abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	faces = faceDetector.detectMultiScale(abuAbu, 1.3 , 5)
+	imgRGB = cv2.flip(frame, 1)
 
-	for x, y, w, h in faces:
-		frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+	imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
+	imgGray = cv2.resize(imgGray, (width2, height2))
+	faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
+
+	for x1, y1, w1, h1 in faces:
+		x2 = round(x1 * 3, 0)
+		y2 = round(y1 * 3, 0)
+		w2 = round(w1 * 3, 0)
+		h2 = round(h1 * 3, 0)
+
+		imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
 		jumlahWajah = int(str(faces.shape[0]))
-		Id, confidence = faceRecognizer.predict(abuAbu[y:y+h,x:x+w])
+		Id, confidence = faceRecognizer.predict(imgGray[y1:y1+h1, x1:x1+w1])
 
-		if confidence >= 20 and confidence <= 100:
+		if confidence >= 80 and confidence <= 100:
 			nameID = names[Id]
 			confidenceTxt = " {0}%".format(round(confidence))
 			
 		else:
 			nameID = names[0]
-			confidenceTxt = " {0}%".format(round(confidence))
+			confidenceTxt = " {0}%".format(round(100-confidence))
 
-		if count2 < faceCompare:
-			detectResult[count2] = names.index(nameID)
-			count2 += 1
+		if jumlahWajah > 1:
+			imgRGB = cv2.putText(imgRGB, str('Wajah lebih dari satu!'), (25, 25), font, 0.7, (54, 67, 244), 2)
 
-		cv2.putText(frame,str(nameID),(x,y-5),font,0.9, (255,255,255), 2)
-		cv2.putText(frame,str(confidenceTxt),(x+w-60,y+h-5),font,0.7, (255,255,0), 2)
+		if w1 <= size[0] :
+			imgRGB = cv2.putText(imgRGB, str('Wajah terlalu jauh!'), (5, 25), font, 0.7, (41, 50, 183), 2)
+		
+		elif w1 >= size[1]:
+			imgRGB = cv2.putText(imgRGB, str('Wajah terlalu dekat!'), (5, 25), font, 0.7, (41, 50, 183), 2)
 
-	cv2.imshow('Face Recognition', frame)
+		else:
+			imgRGB = cv2.putText(imgRGB, str(nameID), (x2, y2-5), font, 0.7, (145, 202, 19), 2)
+			imgRGB = cv2.putText(imgRGB, str(confidenceTxt), (x2+w2-60, y2+h2-5), font, 0.7, (145, 202, 19), 2)
+			
+			if count2 < faceCompare:
+				detectResult[count2] = names.index(nameID)
+				count2 += 1
 
+	cv2.imshow('Face Recognition', imgRGB)
 	DetectedFace_Now = jumlahWajah
 
 	if count2 == faceCompare:
@@ -187,7 +212,7 @@ def detectFace():
 
 		if faceResult_Last != faceResult_Now or faceState2 == False:
 			faceResult_Last = faceResult_Now
-			print("Compare Wajah   :", detectResult)
+			print("Compare Wajah  :", detectResult)
 			print("User terdeteksi:", faceResult_Now)
 
 		if DetectedFace_Last == 0 and DetectedFace_Now == 1:
@@ -214,7 +239,8 @@ def detectFace():
 				else:
 					txt = 'User ' + faceResult_Now + ' masuk'
 					bot.sendMessage(chat_id, str(txt))
-				saveImage(frame)
+
+				saveImage(imgRGB)
 				sendImage(chat_id)
 
 		elif DetectedFace_Last == 1 and DetectedFace_Now == 0:
