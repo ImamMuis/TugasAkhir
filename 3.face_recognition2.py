@@ -15,21 +15,12 @@ tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-width1 = 480
-height1 = 360
-
-width2 = 220
-height2 = 165
-
-scale = width1 / width2
-cam.set(3, width1)
-cam.set(4, height1)
+cam.set(3, 480)
+cam.set(4, 360)
 
 font = cv2.FONT_HERSHEY_SIMPLEX
-
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
-
 faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
 faceRecognizer.read('data_training/trainer.xml')
 
@@ -108,6 +99,7 @@ def teleBot(msg):
 	show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
 									['Waktu Sekarang','Stop Sistem ']
 							]}
+
 	if command == '/start':
 		bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
@@ -161,9 +153,8 @@ def detectFace():
 
 	succes, frame = cam.read()
 	imgRGB = cv2.flip(frame, 1)
-
 	imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
-	imgGray = cv2.resize(imgGray, (width2, height2))
+	imgGray = cv2.resize(imgGray, (220, 165))
 	faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
 	for x1, y1, w1, h1 in faces:
@@ -217,14 +208,14 @@ def detectFace():
 
 		if DetectedFace_Last == 0 and DetectedFace_Now == 1:
 			DetectedFace_Last = DetectedFace_Now
-			DetectedTime_Now = getCurrent("second")
+			DetectedTime_Now = getCurrent("second") 
 			TimeBetween = Selisih(DetectedTime_Now, notDetectedTime_Now)
 
 			if TimeBetween > DetectedFace_Tolerance or count1 == 0:
 				count1 += 1
 				faceState1 = True
 				faceState2 = True
-				print("Deteksi ke	   :", count1)
+				print("Deteksi ke	  :", count1)
 				print("Hari, Tanggal  :", getCurrent("DATE"))
 				print("Jam            :", getCurrent("Time"))
 				print("")
