@@ -1,4 +1,4 @@
 import os
-path = 'unknown_faces'
-lastImage = os.listdir(path)
-print(lastImage[-1])
+file = os.listdir('/home/pi/[master]/img_record')
+lastImage = sorted(file,key=lambda x: os.path.splitext(x)[0])
+print(lastImage)
