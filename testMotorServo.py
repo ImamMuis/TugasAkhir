@@ -34,7 +34,14 @@ try:
         servoMove(1, 20, 160, 1)
         time.sleep(2)
 
+except KeyboardInterrupt:
+    print("Program Stop")
 
+except:
+    print("Other Error or exception occured!")
+    GPIO.cleanup()
+    print("test2")
+    
 finally:
     kit.servo[0].angle = 90
     kit.servo[1].angle = 90
