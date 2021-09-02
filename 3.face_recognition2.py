@@ -13,7 +13,7 @@ userDir = 'img_record'
 teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-cam = cv2.VideoCapture(-1)
+cam = cv2.VideoCapture(0)
 cam.set(3, 640)
 cam.set(4, 480)
 

@@ -28,7 +28,7 @@ userDir = 'img_record'
 teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-cam = cv2.VideoCapture(-1)
+cam = cv2.VideoCapture(0)
 cam.set(3, 640)
 cam.set(4, 480)
 
@@ -71,7 +71,7 @@ detectResult = [0] * faceCompare
 waktuPintuTerbuka = 0
 motorPWM_Channel = 3
 motorZERO = 0
-motorMIN = 2 ** 15
+motorMIN = 13653
 motorMAX = 2 ** 16 - 1
 GPIO.setmode(GPIO.BCM)
 
@@ -193,6 +193,7 @@ def detectFace():
     global DetectedFace_Tolerance
     global faceResult_Last
     global faceResult_Now
+    global waktuPintuTerbuka
 
     size = [75, 85]
     jumlahWajah = 0
@@ -274,7 +275,6 @@ def detectFace():
             faceResult_Last = faceResult_Now
             print("Compare Wajah  :", detectResult)
             print("User terdeteksi:", faceResult_Now)
-
         if DetectedFace_Last == 0 and DetectedFace_Now == 1:
             DetectedFace_Last = DetectedFace_Now
             DetectedTime_Now = getCurrent("second") 
@@ -288,7 +288,29 @@ def detectFace():
                 print("Hari, Tanggal  :", getCurrent("DATE"))
                 print("Jam            :", getCurrent("Time"))
                 print("")
+                sistemPintu("Buka")
+                while waktuPintuTerbuka < 10:
+                    if GPIO.input(pin_sensorPIR) == 1:
+                        print("Anda sudah masuk")
+                        break
 
+                    if waktuPintuTerbuka < 5:
+                        print("Pintu sudah terbuka, silakan masuk")
+
+                    else:
+                        timerPintu = 10-waktuPintuTerbuka
+                        print("Mohon segera masuk")
+                        print("Pintu akan ditutup dalam waktu ", timerPintu, "detik\n")
+
+                    waktuPintuTerbuka += 1   
+                    time.sleep(1)
+                    
+                if waktuPintuTerbuka == 10:
+                    print("Anda tidak segera masuk")
+
+                waktuPintuTerbuka = 0
+                
+                sistemPintu("Tutup")
                 if chat_id == 0:
                     chat_id = 1338050139
 
@@ -385,14 +407,14 @@ def setupPintu():
             motorStart("CLOSE")        
     motorStop(1)
     print("Pintu sudah tertutup!\n")
-    time.sleep(2)
+    time.sleep(1)
     GPIO.output(pin_solenoid, 0)
 
 def sistemPintu(kondisi):
     if kondisi == "Buka":
         print("Pintu dibuka")
         GPIO.output(pin_solenoid, 1)
-        time.sleep(0.5)
+        time.sleep(0.02)   
 
         while GPIO.input(pin_pintuBuka) == 0:
             motorStart("FORWARD")
@@ -405,12 +427,12 @@ def sistemPintu(kondisi):
         while GPIO.input(pin_pintuTutup) == 0:
             motorStart("REVERSE")
 
-        time.sleep(0.5)
+        time.sleep(0.02)   
         GPIO.output(pin_solenoid, 0)
         print("Pintu tertutup")
         
     motorStop(1)
-    time.sleep(0.1)
+    time.sleep(0.02)   
 
 def checkUser():
     global waktuPintuTerbuka
