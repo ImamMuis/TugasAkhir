@@ -1,5 +1,4 @@
 import time
-import PBlib
 import RPi.GPIO as GPIO
 
 pinLS_Buka = 22
@@ -9,10 +8,11 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(pinLS_Buka, GPIO.IN)
 GPIO.setup(pinLS_Tutup, GPIO.IN)
 
+count = 0
 try: 
 	while True:
 		buka = GPIO.input(pinLS_Buka)
-		tutup = GPIO.input(pinLS_Buka)
+		tutup = GPIO.input(pinLS_Tutup)
 
 		if buka == True:
 			print("Pintu terbuka, ", count)

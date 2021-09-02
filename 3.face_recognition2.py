@@ -13,9 +13,9 @@ userDir = 'img_record'
 teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-cam = cv2.VideoCapture(0)
-cam.set(3, 720)
-cam.set(4, 540)
+cam = cv2.VideoCapture(-1)
+cam.set(3, 640)
+cam.set(4, 480)
 
 setX = 90
 setY = 90
@@ -86,7 +86,7 @@ def saveImage(img):
     cv2.imwrite(userDir + '/' + namaFile, img)
 
 def sendImage(chatId):
-    file = os.listdir('/home/pi/[master]/img_record')
+    file = os.listdir('/home/pi/1.TugasAkhir/img_record')
     lastImage = sorted(file, key = lambda x: os.path.splitext(x)[0])
     foto = lastImage[-1]
     file = str(userDir) + '/' + str(foto)
