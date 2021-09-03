@@ -5,10 +5,12 @@ import sistemKamera as sk
 
 names = ['Unknown', 'Imam', 'Iis']
 
-SensorPIR = sp.Input(17)
-L_Switch = sp.Input(22, 27)
-Solenoid = sp.Output(14)
-DriverMotor = sp.Output(15, 18)
+sp.PIR(17)
+sp.L_Switch(22, 27)
+
+sp.Solenoid(14)
+sp.driverMotor(15, 18)
+sp.LED_Indicator(9, 10, 11)
 
 channelServoX   = 0
 channelServoY   = 1
@@ -17,10 +19,6 @@ ChannelPWMMotor = 2
 sk.driverServo(channelServoX, channelServoY, ChannelPWMMotor)
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 bot = sk.Telebot(tokenBot)
-# sp.PIR(17)
-# sp.Solenoid(14)
-# sp.L_Switch(22, 27)
-# sp.driverMotor(15, 18)
 
 waktuTunggu = 0
 try:  
