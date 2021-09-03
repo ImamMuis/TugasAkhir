@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import sistemPintu1 as sp
+import sistemPintu as sp
 import sistemKamera as sk
 
 GPIO.setmode(GPIO.BCM)
