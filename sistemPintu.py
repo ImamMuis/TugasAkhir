@@ -1,8 +1,8 @@
 import time
-# import busio
-# import RPi.GPIO as GPIO
-# from board import SCL, SDA
-# from adafruit_pca9685 import PCA9685
+import busio
+import RPi.GPIO as GPIO
+from board import SCL, SDA
+from adafruit_pca9685 import PCA9685
 
 GPIO.setmode(GPIO.BCM)
 i2c_bus = busio.I2C(SCL, SDA)

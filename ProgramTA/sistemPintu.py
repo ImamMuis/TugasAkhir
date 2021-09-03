@@ -120,14 +120,14 @@ class driverServo:
         self.servoY = servoY
         self.PWMMotor = PWMMotor
     
-def motorSpeed(begin, end, step, accel):    
+def motorSpeed(self, begin, end, step, accel):    
     if accel == 0:
         pca.channels[motorPWM_Channel].duty_cycle = motorMIN
         time.sleep(0.02)   
     elif accel == 1:
         for i in range(begin, end, step):
             pca.channels[motorPWM_Channel].duty_cycle = i
-            if GPIO.input(pin_pintuBuka) or GPIO.input(pin_pintuTutup) == 1:
+            if GPIO.input(self.pinBuka) or GPIO.input(self.pinTutup) == 1:
                 break
             time.sleep(0.02)
             
