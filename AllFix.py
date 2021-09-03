@@ -28,7 +28,7 @@ userDir = 'img_record'
 teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(-1)
 cam.set(3, 640)
 cam.set(4, 480)
 
@@ -433,38 +433,6 @@ def sistemPintu(kondisi):
         
     motorStop(1)
     time.sleep(0.02)   
-
-def checkUser():
-    global waktuPintuTerbuka
-    user = input("Wajah dikenali? y/n:")
-
-    if user == 'y':
-        sistemPintu("Buka")
-        while waktuPintuTerbuka < 10:
-            if GPIO.input(pin_sensorPIR) == 1:
-                print("Anda sudah masuk")
-                break
-
-            if waktuPintuTerbuka < 5:
-                print("Pintu sudah terbuka, silakan masuk")
-
-            else:
-                timerPintu = 10-waktuPintuTerbuka
-                print("Mohon segera masuk")
-                print("Pintu akan ditutup dalam waktu ", timerPintu, "detik\n")
-
-            waktuPintuTerbuka += 1   
-            time.sleep(1)
-            
-        if waktuPintuTerbuka == 10:
-            print("Anda tidak segera masuk")
-
-        waktuPintuTerbuka = 0
-        
-        sistemPintu("Tutup")
-        
-    elif user == 'n':
-        print("Kirim foto ke telegram...")
 
 bot = telepot.Bot(tokenBot)
 bot.message_loop(teleBot)
