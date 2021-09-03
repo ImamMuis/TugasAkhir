@@ -436,7 +436,7 @@ def sistemPintu(kondisi):
 
 bot = telepot.Bot(tokenBot)
 bot.message_loop(teleBot)
-print ('Telegram Bot Listening...\n')
+print('Telegram Bot Listening...\n')
 
 try:
     setupPIR()

@@ -2,22 +2,23 @@ import RPi.GPIO as GPIO
 import sistemPintu as sp
 import sistemKamera as sk
 
-GPIO.setmode(GPIO.BCM)
-maxUser = 8
-waktuTunggu = 15
+names = ['Unknown', 'Imam', 'Iis']
 
-sp.PIR(22)
+sp.PIR(17)
 sp.Solenoid(14)
-sp.L_Switch(17, 27)
+sp.L_Switch(22, 27)
 sp.driverMotor(15, 18)
+channelServoX   = 0
+channelServoY   = 1
+ChannelPWMMotor = 2
 
-servo0	  = 0
-servo1	  = 1
-PWM_Motor = 2
+sk.driverServo(channelServoX, channelServoY, ChannelPWMMotor)
+tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-sk.driverServo(servo0, servo1, PWM_Motor)
-sk.driver()
+sk.TeleBot.Token(tokenBot)
 
+
+waktuTunggu = 0
 try:  
     sp.PIR.setup()
     sp.Pintu.setup()
