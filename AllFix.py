@@ -15,12 +15,16 @@ pca.frequency = 50
 
 names = ['Unknown', 'Imam', 'Iis']
 
+pin_LedMerah    = 9
+pin_LedKuning   = 10
+pin_LedHijau    = 11
 pin_solenoid    = 14
 pin_pintuBuka   = 22
 pin_pintuTutup  = 27
 pin_sensorPIR   = 17
 pin_motorLogic1 = 15
 pin_motorLogic2 = 18
+
 faceCompare = 20
 DetectedFace_Tolerance = 5
 
@@ -81,6 +85,9 @@ GPIO.setup(pin_pintuTutup, GPIO.IN)
 GPIO.setup(pin_solenoid, GPIO.OUT)
 GPIO.setup(pin_motorLogic1, GPIO.OUT)
 GPIO.setup(pin_motorLogic2, GPIO.OUT)
+GPIO.setup(pin_LedMerah, GPIO.OUT)
+GPIO.setup(pin_LedKuning, GPIO.OUT)
+GPIO.setup(pin_LedHijau, GPIO.OUT)
 
 GPIO.output(pin_solenoid, 0)
 GPIO.output(pin_motorLogic1, 0)
@@ -291,7 +298,7 @@ def detectFace():
                 sistemPintu("Buka")
                 while waktuPintuTerbuka < 10:
                     if GPIO.input(pin_sensorPIR) == 1:
-                        print("Anda sudah masuk")
+                        print("Anda sudah masuk") 
                         break
 
                     if waktuPintuTerbuka < 5:
@@ -413,6 +420,7 @@ def setupPintu():
 def sistemPintu(kondisi):
     if kondisi == "Buka":
         print("Pintu dibuka")
+        LedIndicator(0, 1, 0) 
         GPIO.output(pin_solenoid, 1)
         time.sleep(0.02)   
 
@@ -420,9 +428,11 @@ def sistemPintu(kondisi):
             motorStart("FORWARD")
         
         print("Pintu terbuka")
+        LedIndicator(0, 0, 1) 
 
     elif kondisi == "Tutup":
         print("Pintu ditutup")
+        LedIndicator(0, 1, 0) 
 
         while GPIO.input(pin_pintuTutup) == 0:
             motorStart("REVERSE")
@@ -430,17 +440,29 @@ def sistemPintu(kondisi):
         time.sleep(0.02)   
         GPIO.output(pin_solenoid, 0)
         print("Pintu tertutup")
+        LedIndicator(1, 0, 0) 
         
     motorStop(1)
     time.sleep(0.02)   
+
+def LedIndicator(merah, kuning, hijau):
+    global pin_LedMerah
+    global pin_LedKuning
+    global pin_LedHijau
+    
+    GPIO.output(pin_LedMerah, merah)
+    GPIO.output(pin_LedKuning, kuning)
+    GPIO.output(pin_LedHijau, hijau)
 
 bot = telepot.Bot(tokenBot)
 bot.message_loop(teleBot)
 print('Telegram Bot Listening...\n')
 
 try:
+    LedIndicator(0, 1, 0)
     setupPIR()
     setupPintu()
+    LedIndicator(1, 0, 0)
 
     while True:
         detectFace()
