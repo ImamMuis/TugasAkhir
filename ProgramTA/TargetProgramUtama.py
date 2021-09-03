@@ -22,9 +22,9 @@ bot = sk.Telebot(tokenBot)
 
 waktuTunggu = 0
 try:  
-    SensorPIR.setup()
+    sp.PIR.setup()
     sp.Pintu.setup()
-    Solenoid.kunci()
+    sp.Solenoid.kunci()
     
     while True:                                                                                                                                                                                                                                                                                                                                                                                         
         user = input("Wajah dikenali? y/n: ")
