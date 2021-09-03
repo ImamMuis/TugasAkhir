@@ -1,30 +1,34 @@
+from ProgramTA.sistemPintu import PIR
 import RPi.GPIO as GPIO
 import sistemPintu as sp
 import sistemKamera as sk
 
 names = ['Unknown', 'Imam', 'Iis']
 
-sp.PIR(17)
-sp.Solenoid(14)
-sp.L_Switch(22, 27)
-sp.driverMotor(15, 18)
+SensorPIR = sp.Input(17)
+L_Switch = sp.Input(22, 27)
+Solenoid = sp.Output(14)
+DriverMotor = sp.Output(15, 18)
+
 channelServoX   = 0
 channelServoY   = 1
 ChannelPWMMotor = 2
 
 sk.driverServo(channelServoX, channelServoY, ChannelPWMMotor)
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
-
-sk.TeleBot.Token(tokenBot)
-
+bot = sk.Telebot(tokenBot)
+# sp.PIR(17)
+# sp.Solenoid(14)
+# sp.L_Switch(22, 27)
+# sp.driverMotor(15, 18)
 
 waktuTunggu = 0
 try:  
-    sp.PIR.setup()
+    SensorPIR.setup()
     sp.Pintu.setup()
-    sp.Solenoid.kunci()
+    Solenoid.kunci()
     
-    while True:
+    while True:                                                                                                                                                                                                                                                                                                                                                                                         
         user = input("Wajah dikenali? y/n: ")
         if user == 'y':
             sp.Solenoid.buka()
@@ -45,6 +49,4 @@ except:
     print("\nOther Error or exception occured!")
 
 finally:
-    # motorStop()
-    GPIO.cleanup()
-
+    sp.CleanGPIO()
