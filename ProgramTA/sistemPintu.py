@@ -14,7 +14,7 @@ motorMIN = 13653
 motorMAX = 2 ** 16 - 1
 GPIO.setmode(GPIO.BCM)
 
-def cleanGPIO():
+def CleanGPIO():
     GPIO.cleanup()
 
 class PIR:
@@ -107,7 +107,7 @@ class motorSpeed(driverServo, L_Switch):
         self.end = end
         self.step = step
         self.accel = accel
-        pinMotor = driverServo.pinMotor()
+        pinMotor = 3
         pca.channels[pinMotor].duty_cycle = 13653
         time.sleep(0.02)
         
@@ -146,7 +146,7 @@ class LED_Indicator:
         GPIO.output(self.LEDKuning, 0)
         GPIO.output(self.LEDHijau, 1)
 
-class Pintu(LED_Indicator, L_Switch, driverMotor, Solenoid):
+class Pintu(LED_Indicator, L_Switch, driverMotor, Solenoid): 
     def buka():
         print("Pintu dibuka")
         LED_Indicator.Kuning()
