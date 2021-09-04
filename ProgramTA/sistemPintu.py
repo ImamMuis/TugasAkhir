@@ -14,17 +14,6 @@ motorMIN = 13653
 motorMAX = 2 ** 16 - 1
 GPIO.setmode(GPIO.BCM)
 
-def motorSpeed(self, begin, end, step, accel):    
-    if accel == 0:
-        pca.channels[self.PWMMotor].duty_cycle = motorMIN
-        time.sleep(0.02)   
-    elif accel == 1:
-        for i in range(begin, end, step):
-            pca.channels[self.PWMMotor].duty_cycle = i
-            if GPIO.input(self.pinBuka) or GPIO.input(self.pinTutup) == 1:
-                break
-            time.sleep(0.02)
-
 def cleanGPIO():
     GPIO.cleanup()
 
@@ -72,7 +61,16 @@ class Solenoid:
     def kunci(self):
         GPIO.output(self.pinSol, 0)
 
-class driverMotor:
+class driverServo:
+    def __init__(self, servoX, servoY, PWMMotor):
+        self.servoX = servoX
+        self.servoY = servoY
+        self.PWMMotor = PWMMotor
+
+    def pinMotor(self):
+        self.PWMMotor
+        
+class driverMotor():
     def __init__(self, pinLogic1, pinLogic2):
         self.pinLogic1 = pinLogic1
         self.pinLogic2 = pinLogic2
@@ -83,7 +81,7 @@ class driverMotor:
         GPIO.output(self.pinLogic1, 1)
         GPIO.output(self.pinLogic2, 0)
         motorSpeed(motorMIN, motorMAX, 200, 1)
-
+ 
     def tutupPintu(self):
         GPIO.output(self.pinLogic1, 0)
         GPIO.output(self.pinLogic2, 1)
@@ -93,15 +91,36 @@ class driverMotor:
         GPIO.output(self.pinLogic1, 0)
         GPIO.output(self.pinLogic2, 1)
         motorSpeed(motorMIN, 0, 0, 0)
-
+    
     def motorStop(self, forceBreak = 0):
         if forceBreak == 0:
             print("Motor Stop\n")
-            motorSpeed(motorMIN, motorZERO, -200, 1)
+            motorSpeed(motorMIN, motorZERO, 200, 1) 
 
         elif forceBreak == 1:
             GPIO.output(self.pinLogic1, 0)
             GPIO.output(self.pinLogic2, 0)
+
+class motorSpeed(driverServo, L_Switch):
+    def __init__(self, begin, end, step, accel):
+        self.begin = begin
+        self.end = end
+        self.step = step
+        self.accel = accel
+        pinMotor = driverServo.pinMotor()
+        pca.channels[pinMotor].duty_cycle = 13653
+        time.sleep(0.02)
+        
+        if self.accel == 0:
+            pca.channels[pinMotor].duty_cycle = self.begin
+            
+        elif self.accel == 1:
+            for i in range(self.begin, self.end, self.step):
+                pca.channels[pinMotor].duty_cycle = i
+                if L_Switch.LS_Buka() or L_Switch.LS_Tutup == 1:
+                    break
+        else:
+            print("Parameter 'accel' harus 0 atau 1!")
             
 class LED_Indicator:
     def __init__(self, LEDMerah, LEDKuning, LEDHijau):
@@ -112,7 +131,6 @@ class LED_Indicator:
         GPIO.setup(self.LEDKuning, GPIO.OUT)
         GPIO.setup(self.LEDHijau, GPIO.OUT)
     
-
     def Merah(self):
         GPIO.output(self.LEDMerah, 1)
         GPIO.output(self.LEDKuning, 0)
@@ -128,13 +146,7 @@ class LED_Indicator:
         GPIO.output(self.LEDKuning, 0)
         GPIO.output(self.LEDHijau, 1)
 
-class driverServo:
-    def __init__(self, servoX, servoY, PWMMotor):
-        self.servoX = servoX
-        self.servoY = servoY
-        self.PWMMotor = PWMMotor
-  
-class Pintu:
+class Pintu(LED_Indicator, L_Switch, driverMotor, Solenoid):
     def buka():
         print("Pintu dibuka")
         LED_Indicator.Kuning()
@@ -159,15 +171,17 @@ class Pintu:
     
     def setup():
         print("Memastikan Pintu Tertutup")
+
         if L_Switch.LS_Tutup() == 0:
             print("Pintu sedang terbuka! Pintu akan ditutup...")
             Solenoid.buka()
+
             while L_Switch.LS_Tutup == 0:
                 driverMotor.close()     
+
         driverMotor.motorStop(1)
         print("Pintu sudah tertutup!\n")
         time.sleep(1)
-        Solenoid.kunci
 
     driverMotor.motorStop(1)
     time.sleep(0.02)   
