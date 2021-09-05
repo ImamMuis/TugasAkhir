@@ -29,15 +29,14 @@ class L_Switch:
         print('Pintu tertutup')
         
 class Solenoid:
-    def __init__(self, pinSol):
-        self.pinSol = pinSol
-        GPIO.setup(self.pinSol, GPIO.OUT)
-        print('Solenoid di pin', self.pinSol)
+    def __init__(self, pinBCM):
+        self.pinBCM = pinBCM
     
-    def buka(self):
-        GPIO.output(self.pinSol, 1)
-        print('Solenoid Buka')
+    def output(self):
+        GPIO.setup(self.pinBCM, GPIO.OUT)
 
-    def kunci(self):
-        GPIO.output(self.pinSol, 0)
-        print('Solenoid Tutup')
+    def off(self):
+        GPIO.output(self.pinBCM, 0)
+        
+    def on(self):
+        GPIO.output(self.pinBCM, 1)

@@ -1,7 +1,7 @@
 import time
 import RPi.GPIO as GPIO
 
-Solenoid = 11
+Solenoid = 14
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(Solenoid, GPIO.OUT)

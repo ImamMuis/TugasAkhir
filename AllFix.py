@@ -18,7 +18,7 @@ names = ['Unknown', 'Imam', 'Iis']
 pin_LedMerah    = 9
 pin_LedKuning   = 10
 pin_LedHijau    = 11
-pin_solenoid    = 14
+pin_solenoid    = 19
 pin_pintuBuka   = 22
 pin_pintuTutup  = 27
 pin_sensorPIR   = 17
@@ -92,7 +92,7 @@ GPIO.setup(pin_LedHijau, GPIO.OUT)
 GPIO.output(pin_solenoid, 0)
 GPIO.output(pin_motorLogic1, 0)
 GPIO.output(pin_motorLogic2, 0)
-time.sleep(0.5)
+time.sleep(0.1)
 
 def Selisih(current, prev):
     num = float(current) - float(prev)
@@ -213,10 +213,10 @@ def detectFace():
     faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
     for x1, y1, w1, h1 in faces:
-        x2 = round(x1 * 3, 0)
-        y2 = round(y1 * 3, 0)
-        w2 = round(w1 * 3, 0)
-        h2 = round(h1 * 3, 0)
+        x2 = int(round(x1 * 2.9, 0))
+        y2 = int(round(y1 * 2.9, 0))
+        w2 = int(round(w1 * 2.9, 0))
+        h2 = int(round(h1 * 2.9, 0))
         cX = int(round(x2+w2/2, 0))
         cY = int(round(y2+h2/2, 0))
 
@@ -411,10 +411,10 @@ def setupPintu():
         print("Pintu sedang terbuka! Pintu akan ditutup...")
         GPIO.output(pin_solenoid, 1)
         while GPIO.input(pin_pintuTutup) == 0:
-            motorStart("CLOSE")        
+            motorStart("CLOSE") 
+                  
     motorStop(1)
     print("Pintu sudah tertutup!\n")
-    time.sleep(1)
     GPIO.output(pin_solenoid, 0)
 
 def sistemPintu(kondisi):
@@ -422,7 +422,6 @@ def sistemPintu(kondisi):
         print("Pintu dibuka")
         LedIndicator(0, 1, 0) 
         GPIO.output(pin_solenoid, 1)
-        time.sleep(0.02)   
 
         while GPIO.input(pin_pintuBuka) == 0:
             motorStart("FORWARD")
@@ -436,14 +435,12 @@ def sistemPintu(kondisi):
 
         while GPIO.input(pin_pintuTutup) == 0:
             motorStart("REVERSE")
-
-        time.sleep(0.02)   
+ 
         GPIO.output(pin_solenoid, 0)
         print("Pintu tertutup")
         LedIndicator(1, 0, 0) 
         
-    motorStop(1)
-    time.sleep(0.02)   
+    motorStop(1) 
 
 def LedIndicator(merah, kuning, hijau):
     global pin_LedMerah
