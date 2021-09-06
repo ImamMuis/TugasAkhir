@@ -1,17 +1,23 @@
+import time
 import sistemPintu2 as sp
 # import sistemKamera as sk
 import RPi.GPIO as GPIO
 
 SensorPIR = sp.PIR(17)
-LSBuka, LSTutup = sp.L_Switch(22, 27)
+L_Switch = sp.L_Switch(22, 27)
 
-Motor1 = sp.PIN.Output(15)
-Motor2 = sp.PIN.Output(18)
-Solenoid = sp.PIN.Output(14)
+Solenoid = sp.Solenoid(14)
+Motor = sp.driverMotor(15, 18)
 
 try:
     while True:
-        pass
+        # Solenoid.buka()
+        # time.sleep(1)
+        # Solenoid.kunci()
+        # time.sleep(1)
+        L_Switch.Buka()
+        L_Switch.Tutup()
+        time.sleep(0.02)
 
 except KeyboardInterrupt:
     print("Program Stop")
