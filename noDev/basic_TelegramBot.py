@@ -1,50 +1,96 @@
 import time
-import datetime
 import telepot
-# from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-now = datetime.datetime.now()
+import datetime
 
-def action(msg):
-	chat_id = msg['chat']['id']
-	command = msg['text']
-	print('Received: %s' %command)
+Quit = False
+QuitFlag = False
 
-	if command == '/hi':
-		# telegram_bot.sendMessage(chat_id, 'testing custom keyboard', reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-		#         [InlineKeyboardButton(text="btn1", callback_data='I have Nothing To do'),
-		#          InlineKeyboardButton(text="btn2", callback_data='0'),
-		#          InlineKeyboardButton(text="btn3", callback_data='0'),
-		#          InlineKeyboardButton(text="btn4", callback_data='0')],
-		#         [InlineKeyboardButton(text="btn1", callback_data='yep')]
-		#     ]
-		#     ))
-		telegram_bot.sendMessage(chat_id, str("Hi Imam!"))
+teleBot_PWD = '201802014'
+tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
-	elif command == '/time':
-		telegram_bot.sendMessage(chat_id,
-								 str("Telegram Bot Running at: \n") +
-								 str(now.strftime("Time: %H:%M \n")) +
-								 str(now.strftime("Day  : %a, %d - %b - %Y \n"))
-								 )
+def getCurrent(data):
+    now = datetime.datetime.now()
+    if data == "DATE":
+        value = now.strftime("%a, %d - %b - %Y")
 
-	elif command == '/bagianRaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('KomponenRaspi.png', 'rb'))
+    elif data == "Date":
+        value = now.strftime("%Y%m%d%H%M%S")
 
-	elif command == '/GPIORaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('fotoTele/GPIO_Raspi.png', 'rb'))
+    elif data == "Time":
+        value = now.strftime("%H:%M:%S")
 
-	elif command == '/logoRaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('D://1. IMAM/1. Libraries/Pictures/RaspiLogo.png', 'rb'))
+    elif data == "second":
+        value = str(round(float(str(now).split(":")[-1]), 3))
 
-	else:
-		telegram_bot.sendMessage(chat_id, str("Input Salah!"))
+    else:
+        print("WRONG PARAMETER!")
 
+    return value
 
-telegram_bot = telepot.Bot('1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo')
+def teleBot(msg):
+    global Quit
+    global QuitFlag
+    global teleBot_PWD
 
-telegram_bot.message_loop(action)
+    chat_id = msg['chat']['id']
+    command = msg['text']
 
-print ('Up and Running....')
+    print("From User : %s" %chat_id)
+    print("Command   : %s\n" %command)
 
-while 1:
-	time.sleep(10)
+    show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
+                                    ['Waktu Sekarang','Stop Sistem ']
+                            ]}
+
+    if command == 'Stop Sistem':
+        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        QuitFlag = True
+
+    elif command == teleBot_PWD:
+        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
+        Quit = True
+
+    elif command != teleBot_PWD and QuitFlag == True:
+        bot.sendMessage(chat_id, str('Password Salah!'))
+        QuitFlag = False
+    
+    elif command == '/start':
+        bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
+
+    elif command == 'Ambil Foto':
+        bot.sendMessage(chat_id, str('Hasil tangkapan webcam...'))
+
+    elif command == 'Foto Terakhir':
+        bot.sendMessage(chat_id, str('Foto terakhir...'))
+
+    elif command == 'Waktu Sekarang':
+        value1 = getCurrent("Time")
+        value2 = getCurrent("DATE")
+        bot.sendMessage(chat_id, str('Pukul: ' + value1 + '\n')+
+                                 str('Tanggal: ' + value2 + '\n'))
+
+    elif command == 'Stop Sistem':
+        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        QuitFlag = True
+
+    elif command == teleBot_PWD:
+        bot.sendMessage(chat_id, str('Sistem Telegram Bot terhenti...'))
+        Quit = True
+
+    elif command != teleBot_PWD and QuitFlag == True:
+        bot.sendMessage(chat_id, str('Password Salah!'))
+        QuitFlag = False
+
+    else:
+        bot.sendMessage(chat_id, str("Input belum tersedia!"))
+        bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) 
+
+bot = telepot.Bot(tokenBot)
+bot.message_loop(teleBot)
+print('Telegram Bot Listening...\n')
+
+while True:
+    time.sleep(1)
+    
+    if Quit == True:
+        break

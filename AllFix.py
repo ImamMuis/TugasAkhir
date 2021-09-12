@@ -151,28 +151,39 @@ def teleBot(msg):
                                     ['Waktu Sekarang','Stop Sistem ']
                             ]}
 
-    if command == '/start':
+    if command == 'Stop Sistem':
+        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        QuitFlag = True
+
+    elif command == teleBot_PWD:
+        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
+        Quit = True
+
+    elif command != teleBot_PWD and QuitFlag == True:
+        bot.sendMessage(chat_id, str('Password Salah!'))
+        QuitFlag = False
+    
+    elif command == '/start':
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
     elif command == 'Ambil Foto':
-        saveImage(imgRGB)
-        sendImage(chat_id)
+        bot.sendMessage(chat_id, str('Hasil tangkapan webcam...'))
 
     elif command == 'Foto Terakhir':
-        sendImage(chat_id)
+        bot.sendMessage(chat_id, str('Foto terakhir...'))
 
     elif command == 'Waktu Sekarang':
-        now = datetime.datetime.now()
-        value1 = now.strftime("Time: %H:%M:%S\n")
-        value2 = now.strftime("Day : %a, %d - %b - %Y\n")
-        bot.sendMessage(chat_id, str(value1)+str(value2))
+        value1 = getCurrent("Time")
+        value2 = getCurrent("DATE")
+        bot.sendMessage(chat_id, str('Pukul: ' + value1 + '\n')+
+                                 str('Tanggal: ' + value2 + '\n'))
 
     elif command == 'Stop Sistem':
         bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
         QuitFlag = True
 
     elif command == teleBot_PWD:
-        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
+        bot.sendMessage(chat_id, str('Sistem Telegram Bot terhenti...'))
         Quit = True
 
     elif command != teleBot_PWD and QuitFlag == True:
