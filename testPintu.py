@@ -59,7 +59,7 @@ def motorSpeed(begin, end, step, accel):
             pca.channels[motorPWM_Channel].duty_cycle = i
             if GPIO.input(pinLS_Buka) or GPIO.input(pinLS_Tutup) == 1:
                 break
-        
+      
 try:
     while True:
         time.sleep(0.02)
