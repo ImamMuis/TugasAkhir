@@ -10,14 +10,6 @@ def action(msg):
 	print('Received: %s' %command)
 
 	if command == '/hi':
-		# telegram_bot.sendMessage(chat_id, 'testing custom keyboard', reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-		#         [InlineKeyboardButton(text="btn1", callback_data='I have Nothing To do'),
-		#          InlineKeyboardButton(text="btn2", callback_data='0'),
-		#          InlineKeyboardButton(text="btn3", callback_data='0'),
-		#          InlineKeyboardButton(text="btn4", callback_data='0')],
-		#         [InlineKeyboardButton(text="btn1", callback_data='yep')]
-		#     ]
-		#     ))
 		telegram_bot.sendMessage(chat_id, str("Hi Imam!"))
 
 	elif command == '/time':
