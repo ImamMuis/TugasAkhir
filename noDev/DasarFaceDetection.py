@@ -1,5 +1,5 @@
 import cv2
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 cam.set(3, 720)
 cam.set(4, 540)
 cascadePath = 'haarcascade_frontalface_default.xml'
