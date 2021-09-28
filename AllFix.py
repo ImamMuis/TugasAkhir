@@ -151,7 +151,7 @@ def teleBot(msg):
                                     ['Waktu Sekarang','Stop Sistem ']
                             ]}
     
-    elif command == '/start':
+    if command == '/start':
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
     elif command == 'Ambil Foto':
