@@ -150,18 +150,6 @@ def teleBot(msg):
     show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
                                     ['Waktu Sekarang','Stop Sistem ']
                             ]}
-
-    if command == 'Stop Sistem':
-        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
-        QuitFlag = True
-
-    elif command == teleBot_PWD:
-        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
-        Quit = True
-
-    elif command != teleBot_PWD and QuitFlag == True:
-        bot.sendMessage(chat_id, str('Password Salah!'))
-        QuitFlag = False
     
     elif command == '/start':
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
