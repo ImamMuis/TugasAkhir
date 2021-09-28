@@ -18,7 +18,7 @@ names = ['Unknown', 'Imam', 'Iis']
 pin_LedMerah    = 9
 pin_LedKuning   = 10
 pin_LedHijau    = 11
-pin_solenoid    = 19
+pin_solenoid    = 14
 pin_pintuBuka   = 22
 pin_pintuTutup  = 27
 pin_sensorPIR   = 17
@@ -33,8 +33,10 @@ teleBot_PWD = '201802014'
 tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
 
 cam = cv2.VideoCapture(-1)
-cam.set(3, 640)
-cam.set(4, 480)
+rgbWidth = 640
+rgbHeight = rgbWidth * 0.75
+cam.set(3, rgbWidth)
+cam.set(4, rgbHeight)
 
 setX = 90
 setY = 90
@@ -193,31 +195,33 @@ def detectFace():
     global faceState1
     global faceState2
     global TimeBetween
+    global faceResult_Now
+    global faceResult_Last
+    global waktuPintuTerbuka
     global DetectedFace_Last
     global notDetectedTime_Now
     global notDetectedTime_Last
     global DetectedFace_Tolerance
-    global faceResult_Last
-    global faceResult_Now
-    global waktuPintuTerbuka
 
     size = [75, 85]
     jumlahWajah = 0
-
+    grayWidth = 220
+    grayHeight = grayWidth * 0.75
+    scaling = rgbWidth / grayWidth
+    
     succes, frame = cam.read()
-    succes += succes
     imgRGB = cv2.flip(frame, 1)
-    imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
-    imgGray = cv2.resize(imgGray, (220, 165))
+    imgGray = cv2.resize(imgRGB, (grayWidth, grayHeight))
+    imgGray = cv2.cvtColor(imgGray, cv2.COLOR_BGR2GRAY)
     faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
     for x1, y1, w1, h1 in faces:
-        x2 = int(round(x1 * 2.9, 0))
-        y2 = int(round(y1 * 2.9, 0))
-        w2 = int(round(w1 * 2.9, 0))
-        h2 = int(round(h1 * 2.9, 0))
-        cX = int(round(x2+w2/2, 0))
-        cY = int(round(y2+h2/2, 0))
+        x2 = int(round(x1 * scaling, 0))
+        y2 = int(round(y1 * scaling, 0))
+        w2 = int(round(w1 * scaling, 0))
+        h2 = int(round(h1 * scaling, 0))
+        cX = int(round(x2 + w2 / 2, 0))
+        cY = int(round(y2 + h2 / 2, 0))
 
         imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
         jumlahWajah = int(str(faces.shape[0]))
