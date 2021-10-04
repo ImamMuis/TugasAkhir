@@ -5,7 +5,7 @@ class PIR:
     def __init__(self, pinPIR):
         self.pinPIR = pinPIR
         GPIO.setup(self.pinPIR, GPIO.IN)
-        print('PIR di pin', self.pinPIR)
+        print('GPIO', self.pinPIR, 'sebagai Input  PIR')
         
     def userMasuk(self):
         print('PIR Mendeteksi')
@@ -17,26 +17,44 @@ class L_Switch:
         self.pinTutup = pinTutup
         GPIO.setup(self.pinBuka, GPIO.IN)
         GPIO.setup(self.pinTutup, GPIO.IN)
-        print('LSBuka di pin', self.pinBuka)
-        print('LSTutup di pin', self.pinTutup)
+        print('GPIO', self.pinBuka, 'sebagai Input  LS_Buka')
+        print('GPIO', self.pinTutup, 'sebagai Input  LSTutup')
             
-    def LS_Buka(self):
-        GPIO.input(self.pinBuka)
-        print('Pintu terbuka')
+    def Buka(self):
+        if GPIO.input(self.pinBuka) == True:
+            print('Pintu terbuka')
     
-    def LS_Tutup(self):
-        GPIO.input(self.pinTutup)
-        print('Pintu tertutup')
+    def Tutup(self):
+        if GPIO.input(self.pinTutup) == True:
+            print('Pintu tertutup')
         
 class Solenoid:
-    def __init__(self, pinBCM):
-        self.pinBCM = pinBCM
-    
-    def output(self):
-        GPIO.setup(self.pinBCM, GPIO.OUT)
+    def __init__(self, pinSol):
+        self.pinSol = pinSol
+        GPIO.setup(self.pinSol, GPIO.OUT)
+        print('GPIO', self.pinSol, 'sebagai Output Solenoid')
 
-    def off(self):
-        GPIO.output(self.pinBCM, 0)
+    def buka(self):
+        GPIO.output(self.pinSol, 1)
+        print('Solenoid terbuka')
         
-    def on(self):
-        GPIO.output(self.pinBCM, 1)
+    def kunci(self):
+        GPIO.output(self.pinSol, 0)
+        print('Solenoid terkunci')
+
+class driverMotor:
+    def __init__(self, pinLogic1, pinLogic2):
+        self.pinLogic1 = pinLogic1
+        self.pinLogic2 = pinLogic2
+        print('GPIO', self.pinLogic1, 'sebagai Output pinMotor1')
+        print('GPIO', self.pinLogic2, 'sebagai Output pinMotor2')
+
+    def forward(self):
+        GPIO.output(self.pinLogic1, 0)
+        GPIO.output(self.pinLogic2, 1)
+        print('Rotasi motor: Forward')
+    
+    def reverse(self):
+        GPIO.output(self.pinLogic1, 1)
+        GPIO.output(self.pinLogic2, 0)
+        print('Rotasi motor: Reverse')

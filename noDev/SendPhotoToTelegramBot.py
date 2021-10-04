@@ -3,7 +3,7 @@ import cv2
 import telepot
 import datetime
 
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cam = cv2.VideoCapture(0)
 
 cam.set(3, 400)
 cam.set(4, 225)

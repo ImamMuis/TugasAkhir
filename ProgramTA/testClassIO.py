@@ -1,15 +1,23 @@
-import InputOutput as IO
-import RPi.GPIO as GPIO
 import time
+import sistemPintu2 as sp
+# import sistemKamera as sk
+import RPi.GPIO as GPIO
 
-Selenoid = IO.Output(11)
+SensorPIR = sp.PIR(17)
+L_Switch = sp.L_Switch(22, 27)
+
+Solenoid = sp.Solenoid(14)
+Motor = sp.driverMotor(15, 18)
 
 try:
     while True:
-        Selenoid.buka()
-        time.sleep(1)
-        Selenoid.kunci()
-        time.sleep(1)
+        # Solenoid.buka()
+        # time.sleep(1)
+        # Solenoid.kunci()
+        # time.sleep(1)
+        L_Switch.Buka()
+        L_Switch.Tutup()
+        time.sleep(0.02)
 
 except KeyboardInterrupt:
     print("Program Stop")

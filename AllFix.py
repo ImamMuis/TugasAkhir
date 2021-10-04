@@ -60,7 +60,6 @@ count1 = 0
 count2 = 0
 chat_id = 0
 Quit = False
-QuitFlag = False
 faceState1 = False
 faceState2 = False
 TimeBetween = 0.0
@@ -140,9 +139,9 @@ def teleBot(msg):
     global imgRGB
     global chat_id
     global command
-    global QuitFlag
     global teleBot_PWD
 
+    QuitFlag = False
     chat_id = msg['chat']['id']
     command = msg['text']
 
@@ -477,8 +476,8 @@ try:
 except KeyboardInterrupt:
     print("Program Stop")
 
-except:
-    print("Other Error or exception occured!")
+# except:
+#     print("Other Error or exception occured!")
     
 finally:
     kit.servo[0].angle = 90
