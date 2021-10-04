@@ -36,7 +36,7 @@ def teleBot(msg):
         bot.sendMessage(chat_id, str(value1)+str(value2))
 
     elif command == 'Stop Sistem':
-        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        bot.sendMessage(chat_id, str('Masukan PIN untuk stop sistem'))
         QuitFlag = True
 
     elif command == teleBot_PWD:
