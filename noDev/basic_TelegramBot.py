@@ -1,42 +1,68 @@
 import time
 import datetime
 import telepot
-# from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-now = datetime.datetime.now()
 
-def action(msg):
-	chat_id = msg['chat']['id']
-	command = msg['text']
-	print('Received: %s' %command)
+Quit = False
+teleBot_PWD = '201802014'
+tokenBot = '2026242681:AAH4o92PExV2rl8Bj0WhU8U5QamfvSnEVQw'
 
-	if command == '/hi':
-		telegram_bot.sendMessage(chat_id, str("Hi Imam!"))
+def teleBot(msg):
+    global Quit
+    QuitFlag = False
 
-	elif command == '/time':
-		telegram_bot.sendMessage(chat_id,
-								 str("Telegram Bot Running at: \n") +
-								 str(now.strftime("Time: %H:%M \n")) +
-								 str(now.strftime("Day  : %a, %d - %b - %Y \n"))
-								 )
+    chat_id = msg['chat']['id']
+    command = msg['text']
+    
+    print("From User : %s" %chat_id)
+    print("Command   : %s\n" %command)
 
-	elif command == '/bagianRaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('KomponenRaspi.png', 'rb'))
+    show_keyboard = {'keyboard':[	['Ambil Foto','Foto Terakhir'], 
+                                    ['Waktu Sekarang','Stop Sistem ']
+                            ]}
 
-	elif command == '/GPIORaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('fotoTele/GPIO_Raspi.png', 'rb'))
+    if command == '/start':
+        bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
 
-	elif command == '/logoRaspi':
-		telegram_bot.sendPhoto(chat_id, photo=open('D://1. IMAM/1. Libraries/Pictures/RaspiLogo.png', 'rb'))
+    elif command == 'Ambil Foto':
+        bot.sendMessage(chat_id, str('Kirim Foto'))
 
-	else:
-		telegram_bot.sendMessage(chat_id, str("Input Salah!"))
+    elif command == 'Foto Terakhir':
+        bot.sendMessage(chat_id, str('Foto Terakhir'))
 
+    elif command == 'Waktu Sekarang':
+        now = datetime.datetime.now()
+        value1 = now.strftime("Time: %H:%M:%S\n")
+        value2 = now.strftime("Day : %a, %d - %b - %Y\n")
+        bot.sendMessage(chat_id, str(value1)+str(value2))
 
-telegram_bot = telepot.Bot('1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo')
+    elif command == 'Stop Sistem':
+        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        QuitFlag = True
 
-telegram_bot.message_loop(action)
+    elif command == teleBot_PWD:
+        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
+        Quit = True
 
-print ('Up and Running....')
+    elif command != teleBot_PWD and QuitFlag == True:
+        bot.sendMessage(chat_id, str('Password Salah!'))
+        QuitFlag = False
 
-while 1:
-	time.sleep(10)
+    else:
+        bot.sendMessage(chat_id, str("Input belum tersedia!"))
+        bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) 
+
+bot = telepot.Bot(tokenBot)
+bot.message_loop(teleBot)
+print('Telegram Bot Listening...\n')
+
+try:
+    while 1:
+        time.sleep(1)
+        if Quit == True:
+            break
+
+except KeyboardInterrupt:
+    print("Program Stop")
+
+except:
+    print("Other Error or exception occured!")
