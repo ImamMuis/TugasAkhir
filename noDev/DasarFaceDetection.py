@@ -1,24 +1,52 @@
 import cv2
+
 cam = cv2.VideoCapture(0)
-cam.set(3, 720)
-cam.set(4, 540)
+ratio = 0.75
+rgbWidth = 720
+rgbHeight = int(round(rgbWidth * ratio))
+cam.set(3, rgbWidth)
+cam.set(4, rgbHeight)
+
+font = cv2.FONT_HERSHEY_SIMPLEX
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
-def CAM():
+def detectFace():
+    jumlahWajah = 0
+    grayWidth = 220
+    grayHeight = int(round(grayWidth * ratio))
+    scaling = rgbWidth / grayWidth
+    
     succes, frame = cam.read()
-    frame = cv2.flip(frame, 1)
-    abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = faceDetector.detectMultiScale(abuAbu, 1.3, 5)
-    for x, y, w, h in faces:
-        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    imgRGB = cv2.flip(frame, 1)
+    imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
+    imgGray = cv2.resize(imgGray, (grayWidth, grayHeight))
+    faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
-    cv2.imshow('Face Detection', frame)
+    for x1, y1, w1, h1 in faces:
+        x2 = int(round(x1 * scaling, 0))
+        y2 = int(round(y1 * scaling, 0))
+        w2 = int(round(w1 * scaling, 0))
+        h2 = int(round(h1 * scaling, 0))
 
-while True:
-    test = CAM()
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
+        jumlahWajah = int(str(faces.shape[0]))
 
-cam.release()
-cv2.destroyAllWindows()
+        if jumlahWajah > 1:
+            imgRGB = cv2.putText(imgRGB, str('Wajah lebih dari satu!'), (15, 25), font, 0.7, (54, 67, 244), 2)
+
+    cv2.imshow('Face Detection', imgRGB)
+
+try:
+    while True:
+        detectFace()
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+except KeyboardInterrupt:
+    print("Program Stop")
+
+finally:    
+    cam.release()
+    cv2.destroyAllWindows()

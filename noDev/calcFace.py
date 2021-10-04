@@ -1,4 +1,4 @@
-
+# Kalkulasi wajah dari no id user
 names = ['Unknown','Imam', 'Imam2', 'Imam3']
 totalUser = len(names)
 countID = [0] * totalUser

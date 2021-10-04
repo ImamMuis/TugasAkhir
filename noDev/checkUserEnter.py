@@ -1,4 +1,4 @@
-userMasuk = 
+userMasuk = input("User Id yang masuk:")
 
 dataUser = ['Unknown', 'Imam', 'Iis']
 
