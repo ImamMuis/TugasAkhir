@@ -36,8 +36,8 @@ cam = cv2.VideoCapture(0)
 cam.set(3, 640)
 cam.set(4, 480)
 
-setY = 90
 setX = 90
+setY = 90
 scanArea = [250, 390, 170, 310]
 
 kit = ServoKit(channels=16)
@@ -75,7 +75,7 @@ waktuPintuTerbuka = 0
 motorPWM_Channel = 3
 motorZERO = 0
 motorMIN = 13653
-motorMAX = 2 ** 16 - 1
+motorMAX = 2 ** 15 - 1
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(pin_sensorPIR, GPIO.IN)
@@ -91,7 +91,7 @@ GPIO.setup(pin_LedHijau, GPIO.OUT)
 GPIO.output(pin_solenoid, 0)
 GPIO.output(pin_motorLogic1, 0)
 GPIO.output(pin_motorLogic2, 0)
-time.sleep(0.1)
+time.sleep(0.02)
 
 def Selisih(current, prev):
     num = float(current) - float(prev)
@@ -126,7 +126,7 @@ def saveImage(img):
     cv2.imwrite(userDir + '/' + namaFile, img)
 
 def sendImage(chatId):
-    file = os.listdir('/home/pi/1.TugasAkhir/img_record')
+    file = os.listdir('userDir')
     lastImage = sorted(file, key = lambda x: os.path.splitext(x)[0])
     foto = lastImage[-1]
     file = str(userDir) + '/' + str(foto)
@@ -220,9 +220,9 @@ def detectFace():
         cY = int(round(y2+h2/2, 0))
 
         imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
-        imgRGB = cv2.rectangle(imgRGB, (cX-1, cY-1), (cX+1, cY+1), (0, 0, 255), 2)
-        imgRGB = cv2.putText(imgRGB, str('cX: ' + str(cX)), (15, 100), font, 0.7, (54, 67, 244), 2)
-        imgRGB = cv2.putText(imgRGB, str('cY: ' + str(cY)), (15, 125), font, 0.7, (54, 67, 244), 2)
+        # imgRGB = cv2.rectangle(imgRGB, (cX-1, cY-1), (cX+1, cY+1), (0, 0, 255), 2) #Center Dot
+        # imgRGB = cv2.putText(imgRGB, str('cX: ' + str(cX)), (15, 100), font, 0.7, (54, 67, 244), 2) #Center X
+        # imgRGB = cv2.putText(imgRGB, str('cY: ' + str(cY)), (15, 125), font, 0.7, (54, 67, 244), 2) #Center Y
         
         jumlahWajah = int(str(faces.shape[0]))
         Id, confidence = faceRecognizer.predict(imgGray[y1:y1+h1, x1:x1+w1])
@@ -230,22 +230,22 @@ def detectFace():
         if cX < scanArea[0]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kiri!'), (15, 50), font, 0.7, (54, 67, 244), 2)
             setX += 1
-            kit.servo[0].angle = setX
+            kit.servo[1].angle = setX
        
         elif cX > scanArea[1]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kanan!'), (15, 75), font, 0.7, (54, 67, 244), 2)
             setX -= 1
-            kit.servo[0].angle = setX
+            kit.servo[1].angle = setX
             
         if cY < scanArea[2]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu atas!'), (15, 50), font, 0.7, (54, 67, 244), 2)
             setY -= 1
-            kit.servo[1].angle = setY
+            kit.servo[0].angle = setY
             
         elif cY > scanArea[3]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu bawah!'), (15, 75), font, 0.7, (54, 67, 244), 2)
             setY += 1
-            kit.servo[1].angle = setY
+            kit.servo[0].angle = setY
         
         if confidence >= 80 and confidence <= 100:
             nameID = names[Id]
@@ -272,7 +272,7 @@ def detectFace():
                 detectResult[count2] = names.index(nameID)
                 count2 += 1
 
-    imgRGB = cv2.rectangle(imgRGB, (scanArea[0], scanArea[2]), (scanArea[1], scanArea[3]), (0, 0, 255), 2)
+    # imgRGB = cv2.rectangle(imgRGB, (scanArea[0], scanArea[2]), (scanArea[1], scanArea[3]), (0, 0, 255), 2) #Margin Face Tracking 
     cv2.imshow('Face Recognition', imgRGB)
     DetectedFace_Now = jumlahWajah
 
@@ -299,8 +299,6 @@ def detectFace():
                 if chat_id == 0:
                     chat_id = 1338050139
 
-                saveImage(imgRGB)
-                sendImage(chat_id)
                 print("Deteksi ke     :", count1)
                 print("Hari, Tanggal  :", getCurrent("DATE"))
                 print("Jam            :", getCurrent("Time"))
@@ -311,10 +309,12 @@ def detectFace():
                     bot.sendMessage(chat_id, str(txt))
 
                 else:
+                    sistemPintu("Buka")
+                    saveImage(imgRGB)
+                    sendImage(chat_id)
                     txt = 'User ' + faceResult_Now + ' masuk'
                     bot.sendMessage(chat_id, str(txt))
 
-                    sistemPintu("Buka")
                     while waktuPintuTerbuka < 10:
                         if GPIO.input(pin_sensorPIR) == 1:
                             print("Anda sudah masuk") 
@@ -390,17 +390,15 @@ def motorStop(forceBreak = 0):
 def motorSpeed(begin, end, step, accel):    
     if accel == 0:
         pca.channels[motorPWM_Channel].duty_cycle = motorMIN
-        time.sleep(0.02)   
     elif accel == 1:
         for i in range(begin, end, step):
             pca.channels[motorPWM_Channel].duty_cycle = i
             if GPIO.input(pin_pintuBuka) or GPIO.input(pin_pintuTutup) == 1:
                 break
-            time.sleep(0.02)
 
 def setupPIR():
     print("Menyiapkan Sensor PIR...") 
-    time.sleep(0.5)
+    time.sleep(0.02)
 
     while GPIO.input(pin_sensorPIR) == 1:
         print("Sensor PIR belum siap")
@@ -408,7 +406,7 @@ def setupPIR():
         time.sleep(0.5)
 
     print("Sensor PIR Siap!\n")
-    time.sleep(0.5)
+    time.sleep(0.02)
 
 def setupPintu():
     print("Memastikan Pintu Tertutup")
@@ -483,7 +481,8 @@ except KeyboardInterrupt:
     
 finally:
     while GPIO.input(pin_pintuTutup) == 0:
-        motorStart("REVERSE")
-    kit.servo[1].angle = 90
+        motorStart("CLOSE") 
+    motorStop(1) 
     kit.servo[0].angle = 90
+    kit.servo[1].angle = 90
     GPIO.cleanup()
