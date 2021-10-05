@@ -7,13 +7,13 @@ import cv2
 # cam = cv2.VideoCapture(cam)
 
 # Memulai Video dari webcam
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cam = cv2.VideoCapture(0)
 
  # Mengatur ukuran lebar video ke 720 pixel
 cam.set(3, 720)
 
 # Mengatur ukuran tinggi video ke 360 pixel
-cam.set(4, 360)
+cam.set(4, 540)
 
 # File untuk pendeteksian wajah
 # dengan  Haarcascade Frontal Face
@@ -21,9 +21,9 @@ cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
 # Penomoran Wajah, satu id untuk satu orang
-faceID  = 2
+faceID  = 1
 
-faceSample = 200
+faceSample = 30
 
 # Nama folder sampel wajah
 userDir = 'dataset'
@@ -31,7 +31,6 @@ userDir = 'dataset'
 # counter sampel wajah
 count = 0
 count2 = 0
-
 faceIDFlag = True
 allFile = os.listdir(userDir)
 totalUser = len(allFile)
@@ -65,7 +64,7 @@ while True:
     # Flip video
     frame  = cv2.flip(frame, 1)
 
-    frame = cv2.resize(frame, (533, 400))
+    frame = cv2.resize(frame, (640, 480))
     # Konversi gambar ke abu-abu
     abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

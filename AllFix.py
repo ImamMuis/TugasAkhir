@@ -290,35 +290,16 @@ def detectFace():
                 count1 += 1
                 faceState1 = True
                 faceState2 = True
+
+                if chat_id == 0:
+                    chat_id = 1338050139
+
+                saveImage(imgRGB)
+                sendImage(chat_id)
                 print("Deteksi ke     :", count1)
                 print("Hari, Tanggal  :", getCurrent("DATE"))
                 print("Jam            :", getCurrent("Time"))
                 print("")
-                sistemPintu("Buka")
-                while waktuPintuTerbuka < 10:
-                    if GPIO.input(pin_sensorPIR) == 1:
-                        print("Anda sudah masuk") 
-                        break
-
-                    if waktuPintuTerbuka < 5:
-                        print("Pintu sudah terbuka, silakan masuk")
-
-                    else:
-                        timerPintu = 10-waktuPintuTerbuka
-                        print("Mohon segera masuk")
-                        print("Pintu akan ditutup dalam waktu ", timerPintu, "detik\n")
-
-                    waktuPintuTerbuka += 1   
-                    time.sleep(1)
-                    
-                if waktuPintuTerbuka == 10:
-                    print("Anda tidak segera masuk")
-
-                waktuPintuTerbuka = 0
-                
-                sistemPintu("Tutup")
-                if chat_id == 0:
-                    chat_id = 1338050139
 
                 if faceResult_Now == names[0]:
                     txt = 'Wajah tidak dikenali!'
@@ -328,8 +309,28 @@ def detectFace():
                     txt = 'User ' + faceResult_Now + ' masuk'
                     bot.sendMessage(chat_id, str(txt))
 
-                saveImage(imgRGB)
-                sendImage(chat_id)
+                    sistemPintu("Buka")
+                    while waktuPintuTerbuka < 10:
+                        if GPIO.input(pin_sensorPIR) == 1:
+                            print("Anda sudah masuk") 
+                            break
+
+                        if waktuPintuTerbuka < 5:
+                            print("Pintu sudah terbuka, silakan masuk")
+
+                        else:
+                            timerPintu = 10 - waktuPintuTerbuka
+                            print("Mohon segera masuk")
+                            print("Pintu akan ditutup dalam waktu ", timerPintu, "detik\n")
+
+                        waktuPintuTerbuka += 1   
+                        time.sleep(1)
+                        
+                    if waktuPintuTerbuka == 10:
+                        print("Anda tidak segera masuk")
+
+                    waktuPintuTerbuka = 0
+                    sistemPintu("Tutup")
 
         elif DetectedFace_Last == 1 and DetectedFace_Now == 0:
             DetectedFace_Last = DetectedFace_Now
