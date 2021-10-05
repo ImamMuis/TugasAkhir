@@ -36,9 +36,9 @@ cam = cv2.VideoCapture(0)
 cam.set(3, 640)
 cam.set(4, 480)
 
-setX = 90
 setY = 90
-scanArea = [154, 154, 486, 326]
+setX = 90
+scanArea = [250, 390, 170, 310]
 
 kit = ServoKit(channels=16)
 kit.servo[0].angle = setX
@@ -184,8 +184,8 @@ def teleBot(msg):
 
 def detectFace():
     global Id
-    global setX
     global setY
+    global setX
     global count1
     global count2
     global imgRGB
@@ -212,36 +212,40 @@ def detectFace():
     faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
     for x1, y1, w1, h1 in faces:
-        x2 = int(round(x1 * 2.9, 0))
-        y2 = int(round(y1 * 2.9, 0))
-        w2 = int(round(w1 * 2.9, 0))
-        h2 = int(round(h1 * 2.9, 0))
+        x2 = int(round(x1 * 2.909, 0))
+        y2 = int(round(y1 * 2.909, 0))
+        w2 = int(round(w1 * 2.909, 0))
+        h2 = int(round(h1 * 2.909, 0))
         cX = int(round(x2+w2/2, 0))
         cY = int(round(y2+h2/2, 0))
 
         imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
+        imgRGB = cv2.rectangle(imgRGB, (cX-1, cY-1), (cX+1, cY+1), (0, 0, 255), 2)
+        imgRGB = cv2.putText(imgRGB, str('cX: ' + str(cX)), (15, 100), font, 0.7, (54, 67, 244), 2)
+        imgRGB = cv2.putText(imgRGB, str('cY: ' + str(cY)), (15, 125), font, 0.7, (54, 67, 244), 2)
+        
         jumlahWajah = int(str(faces.shape[0]))
         Id, confidence = faceRecognizer.predict(imgGray[y1:y1+h1, x1:x1+w1])
         
         if cX < scanArea[0]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kiri!'), (15, 50), font, 0.7, (54, 67, 244), 2)
-            setY += 2
-            kit.servo[1].angle = setY
+            setX += 1
+            kit.servo[0].angle = setX
        
-        elif cX > scanArea[2]:
+        elif cX > scanArea[1]:
             imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kanan!'), (15, 75), font, 0.7, (54, 67, 244), 2)
-            setY -= 2
+            setX -= 1
+            kit.servo[0].angle = setX
+            
+        if cY < scanArea[2]:
+            imgRGB = cv2.putText(imgRGB, str('Wajah terlalu atas!'), (15, 50), font, 0.7, (54, 67, 244), 2)
+            setY -= 1
             kit.servo[1].angle = setY
             
-        if cY > scanArea[3]:
-            imgRGB = cv2.putText(imgRGB, str('Wajah terlalu bawah!'), (15, 50), font, 0.7, (54, 67, 244), 2)
-            setX += 2
-            kit.servo[0].angle = setX
-            
-        elif cY < scanArea[1]:
-            imgRGB = cv2.putText(imgRGB, str('Wajah terlalu atas!'), (15, 75), font, 0.7, (54, 67, 244), 2)
-            setX -= 2
-            kit.servo[0].angle = setX
+        elif cY > scanArea[3]:
+            imgRGB = cv2.putText(imgRGB, str('Wajah terlalu bawah!'), (15, 75), font, 0.7, (54, 67, 244), 2)
+            setY += 1
+            kit.servo[1].angle = setY
         
         if confidence >= 80 and confidence <= 100:
             nameID = names[Id]
@@ -268,6 +272,7 @@ def detectFace():
                 detectResult[count2] = names.index(nameID)
                 count2 += 1
 
+    imgRGB = cv2.rectangle(imgRGB, (scanArea[0], scanArea[2]), (scanArea[1], scanArea[3]), (0, 0, 255), 2)
     cv2.imshow('Face Recognition', imgRGB)
     DetectedFace_Now = jumlahWajah
 
@@ -479,6 +484,6 @@ except KeyboardInterrupt:
 finally:
     while GPIO.input(pin_pintuTutup) == 0:
         motorStart("REVERSE")
-    kit.servo[0].angle = 90
     kit.servo[1].angle = 90
+    kit.servo[0].angle = 90
     GPIO.cleanup()
