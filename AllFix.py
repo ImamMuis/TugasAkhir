@@ -30,7 +30,7 @@ DetectedFace_Tolerance = 5
 
 userDir = 'img_record'
 teleBot_PWD = '201802014'
-tokenBot = '1461219516:AAHcyhA_4NIdF5uNQrDIkhsQ0nTpaT_rjZo'
+tokenBot = '2026242681:AAH4o92PExV2rl8Bj0WhU8U5QamfvSnEVQw'
 
 cam = cv2.VideoCapture(0)
 cam.set(3, 640)
@@ -476,6 +476,8 @@ except KeyboardInterrupt:
 #     print("Other Error or exception occured!")
     
 finally:
+    while GPIO.input(pin_pintuTutup) == 0:
+        motorStart("REVERSE")
     kit.servo[0].angle = 90
     kit.servo[1].angle = 90
     GPIO.cleanup()
