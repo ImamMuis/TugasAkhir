@@ -75,18 +75,18 @@ waktuPintuTerbuka = 0
 motorPWM_Channel = 3
 motorZERO = 0
 motorMIN = 13653
-motorMAX = 2 ** 15 - 1
+motorMAX = 2 ** 16 - 1
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(pin_sensorPIR, GPIO.IN)
 GPIO.setup(pin_pintuBuka, GPIO.IN)
 GPIO.setup(pin_pintuTutup, GPIO.IN)
 GPIO.setup(pin_solenoid, GPIO.OUT)
+GPIO.setup(pin_LedMerah, GPIO.OUT)
+GPIO.setup(pin_LedHijau, GPIO.OUT)
+GPIO.setup(pin_LedKuning, GPIO.OUT)
 GPIO.setup(pin_motorLogic1, GPIO.OUT)
 GPIO.setup(pin_motorLogic2, GPIO.OUT)
-GPIO.setup(pin_LedMerah, GPIO.OUT)
-GPIO.setup(pin_LedKuning, GPIO.OUT)
-GPIO.setup(pin_LedHijau, GPIO.OUT)
 
 GPIO.output(pin_solenoid, 0)
 GPIO.output(pin_motorLogic1, 0)
@@ -475,9 +475,6 @@ try:
 
 except KeyboardInterrupt:
     print("Program Stop")
-
-# except:
-#     print("Other Error or exception occured!")
     
 finally:
     while GPIO.input(pin_pintuTutup) == 0:
