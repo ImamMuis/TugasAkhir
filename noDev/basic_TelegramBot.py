@@ -63,6 +63,3 @@ try:
 
 except KeyboardInterrupt:
     print("Program Stop")
-
-except:
-    print("Other Error or exception occured!")
