@@ -1,8 +1,8 @@
 import cv2
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 ratio = 0.75
-rgbWidth = 720
+rgbWidth = 480
 rgbHeight = int(round(rgbWidth * ratio))
 cam.set(3, rgbWidth)
 cam.set(4, rgbHeight)
@@ -18,22 +18,25 @@ def detectFace():
     scaling = rgbWidth / grayWidth
     
     succes, frame = cam.read()
-    imgRGB = cv2.flip(frame, 1)
-    imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
-    imgGray = cv2.resize(imgGray, (grayWidth, grayHeight))
-    faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
+    if succes:
+        imgRGB = cv2.flip(frame, 1)
+        imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
+        imgGray = cv2.resize(imgGray, (grayWidth, grayHeight))
+        faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
 
-    for x1, y1, w1, h1 in faces:
-        x2 = int(round(x1 * scaling, 0))
-        y2 = int(round(y1 * scaling, 0))
-        w2 = int(round(w1 * scaling, 0))
-        h2 = int(round(h1 * scaling, 0))
+        for x1, y1, w1, h1 in faces:
+            x2 = int(round(x1 * scaling, 0))
+            y2 = int(round(y1 * scaling, 0))
+            w2 = int(round(w1 * scaling, 0))
+            h2 = int(round(h1 * scaling, 0))
 
-        imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
-        jumlahWajah = int(str(faces.shape[0]))
+            imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
+            jumlahWajah = int(str(faces.shape[0]))
 
-        if jumlahWajah > 1:
-            imgRGB = cv2.putText(imgRGB, str('Wajah lebih dari satu!'), (15, 25), font, 0.7, (54, 67, 244), 2)
+            if jumlahWajah > 1:
+                imgRGB = cv2.putText(imgRGB, str('Wajah lebih dari satu!'), (15, 25), font, 0.7, (54, 67, 244), 2)
+        else:
+            print(0)
 
     cv2.imshow('Face Detection', imgRGB)
 

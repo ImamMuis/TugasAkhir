@@ -1,107 +1,80 @@
-# Import library OpenCV
 import os
 import cv2
 
-# ipv4_url = 'http://192.168.43.1:8080'
-# cam = f'{ipv4_url}/video'
-# cam = cv2.VideoCapture(cam)
+newUser = input('Masukkan nama user baru: ')
 
-# Memulai Video dari webcam
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+resolution = 480 #pixel
 
- # Mengatur ukuran lebar video ke 720 pixel
-cam.set(3, 720)
+ratio = 4 / 3
+rgbHeight = resolution
+rgbWidth = int(round(rgbHeight * ratio, 0))
+cam.set(3, rgbWidth)
+cam.set(4, rgbHeight)
 
-# Mengatur ukuran tinggi video ke 360 pixel
-cam.set(4, 540)
-
-# File untuk pendeteksian wajah
-# dengan  Haarcascade Frontal Face
-cascadePath = 'haarcascade_frontalface_default.xml'
-faceDetector = cv2.CascadeClassifier(cascadePath)
-
-# Penomoran Wajah, satu id untuk satu orang
-faceID  = 1
-
-faceSample = 30
-
-# Nama folder sampel wajah
-userDir = 'dataset'
-
-# counter sampel wajah
-count = 0
+count1 = 0
 count2 = 0
+faceSample = 30
 faceIDFlag = True
-allFile = os.listdir(userDir)
-totalUser = len(allFile)
-allID = [0] * totalUser
+userDir = 'dataset'
 cascadePath = 'haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
-for file in allFile:
-    allID[count2] = int(file.split(".")[1])
-    count2 += 1
+with open('Username.txt', 'r') as user :
+    names = user.read()
 
-allID = list(dict.fromkeys(allID))
+if newUser in names:
+    print('Nama user sudah ada!')
+    print('Coba nama user lain!\n')
+    faceIDFlag = False
 
-# Start perulangan menggunakan while
+elif '\n\n' in names:
+    print('Penambahan user baru: ', newUser)
+    names = names.replace('\n\n', '\n' + newUser + '\n')
+
+    with open('Username.txt', 'w') as user:
+        user.write(names)
+
+else:
+    print('Penambahan user baru: ', newUser)
+    with open('Username.txt', 'a') as user:
+            user.write(newUser + '\n')
+
+with open('Username.txt', 'r') as user:
+    names = user.read().splitlines()
+    faceID = names.index(newUser)
+
 while True:
-    if faceID in allID:
-        print("User", faceID, "sudah ada!")
-        print("Nomor User terdaftar:", allID)
-        print("Coba nomor User lain")
+    if faceIDFlag == True:
+        print("Perekaman data wajah User", faceID)
+        jumlahWajah = 0
+        succes, frame = cam.read()
+        
+        if succes:
+            imgRGB  = cv2.flip(frame, 1)
+            imgGray = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
+            imgGray = cv2.resize(imgGray, (rgbWidth, rgbHeight))
+            faces = faceDetector.detectMultiScale(imgGray, 1.2, 3)
+
+            for x, y, w, h in faces:
+                imgRGB = cv2.rectangle(imgRGB, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                jumlahWajah = int(str(faces.shape[0]))
+                
+                if jumlahWajah == 1:
+                    count1 += 1
+                    namaFile = 'User.' + str(faceID) + '.' + str(count1) + '.jpg'
+                    cv2.imwrite(userDir + '/' + namaFile, imgGray[y:y+h, x:x+w])
+
+            cv2.imshow('Pengambilan Dataset Wajah', imgRGB)
+
+    elif faceIDFlag == False:
         break
 
-    elif faceIDFlag == True:
-        print("Perekaman data wajah User", faceID)
-        faceIDFlag = False
-        
-    jumlahWajah = 0
-
-    # Memulai membaca video
-    succes, frame = cam.read()
-
-    # Flip video
-    frame  = cv2.flip(frame, 1)
-
-    frame = cv2.resize(frame, (640, 480))
-    # Konversi gambar ke abu-abu
-    abuAbu = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Mendeteksi wajah dari variabel abuAbu
-    faces = faceDetector.detectMultiScale(abuAbu, 1.3, 5)
-
-    for x, y, w, h in faces:
-        # Membuat rectangle untuk wajah
-        frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        
-        jumlahWajah = int(str(faces.shape[0]))
-        
-        if jumlahWajah == 1:
-        
-        # Increment untuk sampel wajah
-            count += 1
-     
-            # Nama file sampel wajah
-            namaFile = 'User.' + str(faceID) + '.' + str(count) + '.jpg'
-
-            # Simpan file sampel wajah dan di crop
-            cv2.imwrite(userDir + '/' + namaFile, abuAbu[y:y+h, x:x+w])
-
-    # Membuat window hasil tangkapan kamera
-    cv2.imshow('Pengambilan Dataset Wajah', frame)
-
-    # Tekan q untuk stop video
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # Jika sampel gambar wajah sudah lebih dari 200, stop pengambilan gambar
-    elif count >= faceSample:
-
+    elif count1 >= faceSample:
         break
 
-# Stop hasil tangkapan kamera
 cam.release()
-
-# Tutup semua window yang berjalan
 cv2.destroyAllWindows()
