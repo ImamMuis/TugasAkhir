@@ -1,4 +1,3 @@
-import os
 import cv2
 
 newUser = input('Masukkan nama user baru: ')
@@ -11,38 +10,39 @@ rgbHeight = resolution
 rgbWidth = int(round(rgbHeight * ratio, 0))
 cam.set(3, rgbWidth)
 cam.set(4, rgbHeight)
-
 count1 = 0
 count2 = 0
 faceSample = 30
 faceIDFlag = True
 userDir = 'dataset'
+fileUser = 'data/Username.txt'
 cascadePath = 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
-with open('Username.txt', 'r') as user :
+with open(fileUser) as user:
     names = user.read()
 
-if newUser in names:
-    print('Nama user sudah ada!')
-    print('Coba nama user lain!\n')
-    faceIDFlag = False
+    if newUser in names:
+        print('Nama user sudah ada!')
+        print('Coba nama user lain!\n')
+        faceIDFlag = False
 
-elif '\n\n' in names:
-    print('Penambahan user baru: ', newUser)
-    names = names.replace('\n\n', '\n' + newUser + '\n')
+    elif '\n\n' in names:
+        print('Penambahan user baru: ', newUser)
+        names = names.replace('\n\n', '\n' + newUser + '\n')
 
-    with open('Username.txt', 'w') as user:
-        user.write(names)
+        with open(fileUser, 'w') as user:
+            user.write(names)
 
-else:
-    print('Penambahan user baru: ', newUser)
-    with open('Username.txt', 'a') as user:
+    else:
+        print('Penambahan user baru: ', newUser)
+
+        with open(fileUser, 'a') as user:
             user.write(newUser + '\n')
 
-with open('Username.txt', 'r') as user:
-    names = user.read().splitlines()
-    faceID = names.index(newUser)
+with open(fileUser) as user:
+    namesList = user.read().splitlines()
+    faceID = namesList.index(newUser)
 
 while True:
     if faceIDFlag == True:
@@ -62,8 +62,8 @@ while True:
                 
                 if jumlahWajah == 1:
                     count1 += 1
-                    namaFile = 'User.' + str(faceID) + '.' + str(count1) + '.jpg'
-                    cv2.imwrite(userDir + '/' + namaFile, imgGray[y:y+h, x:x+w])
+                    namafileUser = 'User.' + str(faceID) + '.' + str(count1) + '.jpg'
+                    cv2.imwrite(userDir + '/' + namafileUser, imgGray[y:y+h, x:x+w])
 
             cv2.imshow('Pengambilan Dataset Wajah', imgRGB)
 

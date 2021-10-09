@@ -4,8 +4,9 @@ deleteUser = input('Masukkan nama user yang ingin dihapus: ')
 userID = 0
 jumlahGambar = 30
 userDir = 'dataset'
+fileUser = 'data/Username.txt'
 
-with open('Username.txt', 'r') as user:
+with open(fileUser) as user:
     names = user.read().splitlines()
 
     if deleteUser not in names:
@@ -19,7 +20,7 @@ with open('Username.txt', 'r') as user:
             file = userDir + '/' + 'User.' + str(deleteId) + '.' + str(num) + '.jpg'
             os.remove(file)
 
-with open('Username.txt', 'r') as user :
+with open(fileUser) as user :
     names = user.read()
     names2 = names.splitlines()
 
@@ -27,10 +28,10 @@ with open('Username.txt', 'r') as user :
         print('Penghapusan User', deleteUser)
         names = names.replace(deleteUser, '')
 
-        with open('Username.txt', 'w') as user:
+        with open(fileUser, 'w') as user:
             user.write(names)
 
-with open('Username.txt', 'r') as user:
+with open(fileUser) as user:
     names = user.read().splitlines()
     names.reverse()
 
@@ -39,6 +40,6 @@ with open('Username.txt', 'r') as user:
 
     names.reverse()
 
-with open('Username.txt', 'w') as user:
+with open(fileUser, 'w') as user:
     for name in names:
         user.write('%s\n' %name)
