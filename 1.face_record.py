@@ -17,7 +17,7 @@ count2 = 0
 faceSample = 30
 faceIDFlag = True
 userDir = 'dataset'
-cascadePath = 'haarcascade_frontalface_default.xml'
+cascadePath = 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
 with open('Username.txt', 'r') as user :

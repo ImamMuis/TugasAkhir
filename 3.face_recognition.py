@@ -52,7 +52,7 @@ kit.servo[0].set_pulse_width_range(500, 2750)
 kit.servo[1].set_pulse_width_range(500, 2750)
 
 font = cv2.FONT_HERSHEY_SIMPLEX
-cascadePath = 'haarcascade_frontalface_default.xml'
+cascadePath = 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
 faceRecognizer.read('data_training/trainer.xml')

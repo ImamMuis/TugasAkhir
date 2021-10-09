@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 
 userDir = 'dataset'
-cascadePath = 'haarcascade_frontalface_default.xml'
+cascadePath = 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
 
