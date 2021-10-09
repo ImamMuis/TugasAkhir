@@ -1,5 +1,5 @@
+.idea/
 dataset/
 img_record/
-haarcascade_frontalface_default.xml
-.idea/
-data_training/haarcascade_frontalface_default.xml
+data/haarcascade_frontalface_default.xml
+system_development/ProgramTA/haarcascade_frontalface_default.xml
