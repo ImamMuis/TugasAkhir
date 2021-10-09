@@ -1,7 +1,5 @@
 dataset/
-dataset2/
-noDev/
 img_record/
-unknown_faces/
 haarcascade_frontalface_default.xml
 .idea/
+data_training/haarcascade_frontalface_default.xml
