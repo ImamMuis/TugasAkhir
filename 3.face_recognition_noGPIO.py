@@ -144,7 +144,7 @@ def getCurrent(data):
         value = f'{dayNow}, {date} {monthNow} {year}'
 
     elif data == 'Date':
-        value = now.strftime('%Y%m%d%H%M%S')
+        value = now.strftime('%Y-%m-%d.%H.%M.%S')
 
     elif data == 'TIME':
         value = now.strftime('%H:%M:%S')
