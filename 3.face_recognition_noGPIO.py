@@ -1,15 +1,29 @@
+""" 
+Proyek Akhir :  PENERAPAN FACE RECOGNITION UNTUK SISTEM
+                KEAMANAN PINTU RUANGAN BERBASIS
+                KECERDASAN BUATAN 
+Grup         :  7
+Anggota      :  - Iis Lisnawati (Mekanikal & Elektrikal)
+                - Imam Muis Hamzah Harahap (Pemrograman Sistem)
+Fitur        :  1. Face Tracking dengan Servo
+                2. Atur Servo via Telegram Bot
+                3. Melihat riwayat pendeteksian
+                4. Simpan data user masuk ke Excel
+                5. Ambil foto terbaru dari webcam via Telegram Bot
+                6. Pengiriman hasil pendeteksian wajah via Telegram Bot
+"""
+
 import os
 import cv2
 # import time
 # import busio
 import telepot
 import datetime
+import openpyxl 
 # import RPi.GPIO as GPIO
 # from board import SCL, SDA
 # from adafruit_pca9685 import PCA9685
 # from adafruit_servokit import ServoKit
-
-telebotAdminID = 1338050139
 
 pin_solenoid    = 14
 pin_pintuBuka   = 22
@@ -17,7 +31,7 @@ pin_pintuTutup  = 27
 pin_sensorPIR   = 17
 pin_motorLogic1 = 15
 pin_motorLogic2 = 18
-
+telebotAdminID  = 1338050139
 faceCompare = 20
 DetectedFace_Tolerance = 3
 waktuPintuTerbuka = 5 #detik
@@ -25,11 +39,12 @@ motorMAX = 2 ** 16 - 1 #65535 (24V)
 motorMIN = 13653 # 13653/65535*24= 5V
 
 userDir = 'img_record'
-teleBot_PWD = '201802014'
+teleBot_PWD = 'Riqqi'
 fileUser = 'data/Username.txt'
+dataMasuk = 'data/userMasuk.xlsx'
 tokenBot = '2026242681:AAH4o92PExV2rl8Bj0WhU8U5QamfvSnEVQw'
 
-# cam = cv2.VideoCapture(0) # Raspi
+# cam = cv2.VideoCapture(0) #Raspi
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW) #Windows
 resolution = 480
 
@@ -38,7 +53,6 @@ rgbHeight = resolution
 rgbWidth = int(round(rgbHeight * ratio, 0))
 cam.set(3, rgbWidth)
 cam.set(4, rgbHeight)
-
 servoX_Degree = 90
 servoY_Degree = 90
 facePosition = [250, 390, 170, 310]
@@ -46,10 +60,7 @@ facePosition = [250, 390, 170, 310]
 # i2c_bus = busio.I2C(SCL, SDA)
 # pca = PCA9685(i2c_bus)
 # pca.frequency = 50
-
 # kit = ServoKit(channels=16)
-# kit.servo[0].angle = servoX_Degree
-# kit.servo[1].angle = servoY_Degree
 # kit.servo[0].set_pulse_width_range(500, 2750)
 # kit.servo[1].set_pulse_width_range(500, 2750)
 
@@ -161,6 +172,21 @@ def getCurrent(data):
         print('Parameter Salah!')
 
     return value
+
+def saveToExcel(user, dates, time):
+    wb = openpyxl.load_workbook(dataMasuk) 
+    sheet = wb.active 
+    maxRow = sheet.max_row
+    count = maxRow
+    day = dates.split(',')[0]
+    date = dates.split(',')[1]
+    newdata = [[count, user, day, date, time]]
+    
+    for row in newdata:
+        sheet.append(row)
+    
+    wb.save(dataMasuk)
+    return count
 
 def saveImage(img):
     date = getCurrent('DATE')
@@ -294,13 +320,12 @@ def teleBot(msg):
 
     chat_id = msg['chat']['id']
     command = msg['text']
-
     print('From User : ', chat_id)
     print('Command   : ', command)
 
-    show_keyboard = {'keyboard':[	[  'Ambil Foto',     '^',  'Foto Terakhir'], 
-                                    [      '<',   'Reset Servo',   '>'     ],
-                                    ['Waktu Sekarang',   'v',   'Stop Sistem' ]
+    show_keyboard = {'keyboard':[	['Ambil Foto', '^', 'Foto Terakhir'], 
+                                    ['<', 'Reset Servo', '>'],
+                                    ['History User Masuk', 'v', 'Stop Sistem']
                             ]}
 
     if command == '/start':
@@ -325,11 +350,8 @@ def teleBot(msg):
     elif command == 'Foto Terakhir':
         sendImage(chat_id)
 
-    elif command == 'Waktu Sekarang':
-        value1 = getCurrent('TIME')
-        value2 = getCurrent('DATE')
-        txt = f'Time: {value1}\nDate: {value2}'
-        bot.sendMessage(chat_id, txt)
+    elif command == 'History User Masuk':
+        bot.sendDocument(chat_id, document=open(dataMasuk, 'rb'))
 
     elif command == '^':
         servoY_Degree -= 5
@@ -409,15 +431,11 @@ def detectFace():
             h2 = int(round(h1 * scaling, 0))
             cX = int(round(x2+w2/2, 0))
             cY = int(round(y2+h2/2, 0))
-
             imgRGB = cv2.rectangle(imgRGB, (x2, y2), (x2+w2, y2+h2), (186, 39, 59), 2)
             jumlahWajah = int(str(faces.shape[0]))
             Id, confidence = faceRecognizer.predict(imgGray[y1:y1+h1, x1:x1+w1])
-            
-            if jumlahWajah == 0:
-                imgRGB = cv2.putText(imgRGB, 'Tidak ada Wajah', (15, 50), font, 0.7, (54, 67, 244), 2)
 
-            elif jumlahWajah > 1:
+            if jumlahWajah > 1:
                 imgRGB = cv2.putText(imgRGB, 'Wajah lebih dari satu!', (15, 50), font, 0.7, (54, 67, 244), 2)
             
             elif jumlahWajah == 1:
@@ -475,6 +493,9 @@ def detectFace():
                 faceResult_Last = faceResult_Now
                 print('Compare Wajah  :', detectResult)
                 print('User terdeteksi:', faceResult_Now)
+                Date = getCurrent('DATE')
+                Time = getCurrent('Time')
+                count1 = saveToExcel(faceResult_Now, Date, Time)
 
             if DetectedFace_Last == 0 and DetectedFace_Now == 1:
                 DetectedFace_Last = DetectedFace_Now
@@ -485,19 +506,17 @@ def detectFace():
                     if chat_id == 0:
                         chat_id = telebotAdminID
 
-                    count1 += 1
-                    faceState1 = True
-                    faceState2 = True
-
                     print('Deteksi ke     :', count1)
                     print('Hari, Tanggal  :', getCurrent('DATE'))
                     print('Jam            :', getCurrent('TIME'))
                     print('')
+                    count1 += 1
+                    faceState1 = True
+                    faceState2 = True
 
                     if faceResult_Now == names[0]:
                         saveImage(imgRGB)
                         sendImage(chat_id)
-
                         txt = 'Wajah tidak dikenali!\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
                         Time = str('Jam : '     + getCurrent('Time') + '\n')
@@ -508,7 +527,7 @@ def detectFace():
                         sistemPintu('Buka')
                         saveImage(imgRGB)
                         sendImage(chat_id)
-
+                        
                         txt = 'User ' + faceResult_Now + ' masuk\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
                         Time = str('Jam : '     + getCurrent('Time') + '\n')
@@ -554,7 +573,7 @@ def detectFace():
                     count2 = 0
                     faceState2 = False
                     print('Tidak Ada Wajah!')
-                    txt = 'Tidak ada wajah  terdeteksi dalam 5 detik terakhir'
+                    txt = f'Tidak ada wajah  terdeteksi dalam {DetectedFace_Tolerance} detik terakhir'
                     bot.sendMessage(chat_id, txt)
 
 bot = telepot.Bot(tokenBot)
@@ -564,10 +583,10 @@ print('Telegram Bot Listening...\n')
 try:
     setupPIR()
     setupPintu()
-
+    servoMove(0, 90)
+    servoMove(1, 90)
     while True:
         detectFace()
-
         if cv2.waitKey(1) & 0xFF == ord('q') or Quit == True:
             break
 
@@ -580,5 +599,5 @@ finally:
     setupPintu()
     motorStop(1) 
     servoMove(0, 90)
-    servoMove(0, 90)
+    servoMove(1, 90)
     # GPIO.cleanup()
