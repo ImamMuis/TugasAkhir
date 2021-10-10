@@ -1,13 +1,13 @@
 import os
 import cv2
-import time
-import busio
+# import time
+# import busio
 import telepot
 import datetime
-import RPi.GPIO as GPIO
-from board import SCL, SDA
-from adafruit_pca9685 import PCA9685
-from adafruit_servokit import ServoKit
+# import RPi.GPIO as GPIO
+# from board import SCL, SDA
+# from adafruit_pca9685 import PCA9685
+# from adafruit_servokit import ServoKit
 
 telebotAdminID = 1338050139
 
@@ -29,7 +29,8 @@ teleBot_PWD = '201802014'
 fileUser = 'data/Username.txt'
 tokenBot = '2026242681:AAH4o92PExV2rl8Bj0WhU8U5QamfvSnEVQw'
 
-cam = cv2.VideoCapture(0)
+# cam = cv2.VideoCapture(0) # Raspi
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW) #Windows
 resolution = 480
 
 ratio = 4 / 3
@@ -42,15 +43,15 @@ servoX_Degree = 90
 servoY_Degree = 90
 faceSize = [250, 390, 170, 310]
 
-i2c_bus = busio.I2C(SCL, SDA)
-pca = PCA9685(i2c_bus)
-pca.frequency = 50
+# i2c_bus = busio.I2C(SCL, SDA)
+# pca = PCA9685(i2c_bus)
+# pca.frequency = 50
 
-kit = ServoKit(channels=16)
-kit.servo[0].angle = servoX_Degree
-kit.servo[1].angle = servoY_Degree
-kit.servo[0].set_pulse_width_range(500, 2750)
-kit.servo[1].set_pulse_width_range(500, 2750)
+# kit = ServoKit(channels=16)
+# kit.servo[0].angle = servoX_Degree
+# kit.servo[1].angle = servoY_Degree
+# kit.servo[0].set_pulse_width_range(500, 2750)
+# kit.servo[1].set_pulse_width_range(500, 2750)
 
 with open(fileUser) as user:
     names = user.read().splitlines()
@@ -68,6 +69,7 @@ count2 = 0
 chat_id = 0
 Quit = False
 motorZERO = 0
+QuitFlag = False
 faceState1 = False
 faceState2 = False
 TimeBetween = 0.0
@@ -83,18 +85,18 @@ totalUser = len(names)
 countID = [0] * totalUser
 detectResult = [0] * faceCompare
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(pin_sensorPIR, GPIO.IN)
-GPIO.setup(pin_pintuBuka, GPIO.IN)
-GPIO.setup(pin_pintuTutup, GPIO.IN)
-GPIO.setup(pin_solenoid, GPIO.OUT)
-GPIO.setup(pin_motorLogic1, GPIO.OUT)
-GPIO.setup(pin_motorLogic2, GPIO.OUT)
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(pin_sensorPIR, GPIO.IN)
+# GPIO.setup(pin_pintuBuka, GPIO.IN)
+# GPIO.setup(pin_pintuTutup, GPIO.IN)
+# GPIO.setup(pin_solenoid, GPIO.OUT)
+# GPIO.setup(pin_motorLogic1, GPIO.OUT)
+# GPIO.setup(pin_motorLogic2, GPIO.OUT)
 
-GPIO.output(pin_solenoid, 0)
-GPIO.output(pin_motorLogic1, 0)
-GPIO.output(pin_motorLogic2, 0)
-time.sleep(0.02)
+# GPIO.output(pin_solenoid, 0)
+# GPIO.output(pin_motorLogic1, 0)
+# GPIO.output(pin_motorLogic2, 0)
+# time.sleep(0.02)
 
 def Selisih(current, prev):
     num = float(current) - float(prev)
@@ -142,33 +144,35 @@ def sendImage(chatId):
     foto = lastImage[-1]
     file = str(userDir) + '/' + str(foto)
     bot.sendPhoto(chatId, photo=open(file, 'rb'))
-    
+
 def motorSpeed(begin, end, step, accel):    
     if accel == 0:
-        pca.channels[motorPWM_Channel].duty_cycle = motorMIN
+        # pca.channels[motorPWM_Channel].duty_cycle = motorMIN
+        pass
 
     elif accel == 1:
         for i in range(begin, end, step):
-            pca.channels[motorPWM_Channel].duty_cycle = i
-            if GPIO.input(pin_pintuBuka) or GPIO.input(pin_pintuTutup) == 1:
-                break
+            pass
+            # pca.channels[motorPWM_Channel].duty_cycle = i
+            # if GPIO.input(pin_pintuBuka) or GPIO.input(pin_pintuTutup) == 1:
+            #     break
 
 def motorStart(mode):
     if mode == 'FORWARD':
         print('Mode: Forward')
-        GPIO.output(pin_motorLogic1, 1)
-        GPIO.output(pin_motorLogic2, 0)
+        # GPIO.output(pin_motorLogic1, 1)
+        # GPIO.output(pin_motorLogic2, 0)
         motorSpeed(motorMIN, motorMAX, 200, 1)
 
     elif mode == 'REVERSE':
         print('Mode: Reverse')
-        GPIO.output(pin_motorLogic1, 0)
-        GPIO.output(pin_motorLogic2, 1)
+        # GPIO.output(pin_motorLogic1, 0)
+        # GPIO.output(pin_motorLogic2, 1)
         motorSpeed(motorMIN, motorMAX, 200, 1)
 
     elif mode == 'CLOSE':
-        GPIO.output(pin_motorLogic1, 0)
-        GPIO.output(pin_motorLogic2, 1)
+        # GPIO.output(pin_motorLogic1, 0)
+        # GPIO.output(pin_motorLogic2, 1)
         motorSpeed(motorMIN, 0, 0, 0)
 
     else:
@@ -180,67 +184,81 @@ def motorStop(forceBreak = 0):
         motorSpeed(motorMIN, motorZERO, -200, 1)
 
     elif forceBreak == 1:
-        GPIO.output(pin_motorLogic1, 0)
-        GPIO.output(pin_motorLogic2, 0)
+        # GPIO.output(pin_motorLogic1, 0)
+        # GPIO.output(pin_motorLogic2, 0)
+        pass
 
 def setupPIR():
     print('Menyiapkan Sensor PIR...') 
-    time.sleep(0.02)
+    # time.sleep(0.02)
 
-    while GPIO.input(pin_sensorPIR) == 1:
-        print('Sensor PIR belum siap')
-        print('Mohon untuk tidak ada pergerakan terlebih dahulu!')
-        time.sleep(0.5)
+    # while GPIO.input(pin_sensorPIR) == 1:
+    #     print('Sensor PIR belum siap')
+    #     print('Mohon untuk tidak ada pergerakan terlebih dahulu!')
+    #     time.sleep(0.5)
 
     print('Sensor PIR Siap!')
-    time.sleep(0.02)
+    # time.sleep(0.02)
 
 def setupPintu():
     print('Memastikan Pintu Tertutup')
 
-    if GPIO.input(pin_pintuTutup) == 0:
-        print('Pintu sedang terbuka! Pintu akan ditutup...')
-        GPIO.output(pin_solenoid, 1)
-        time.sleep(0.5)
+    # if GPIO.input(pin_pintuTutup) == 0:
+    #     print('Pintu sedang terbuka! Pintu akan ditutup...')
+    #     GPIO.output(pin_solenoid, 1)
+    #     time.sleep(0.5)
 
-        while GPIO.input(pin_pintuTutup) == 0:
-            motorStart('CLOSE') 
+    #     while GPIO.input(pin_pintuTutup) == 0:
+    #         motorStart('CLOSE') 
                   
     motorStop(1)
     print('Pintu sudah tertutup!')
-    GPIO.output(pin_solenoid, 0)
+    # GPIO.output(pin_solenoid, 0)
 
 def sistemPintu(kondisi):
     if kondisi == 'Buka':
         print('Pintu dibuka')
-        GPIO.output(pin_solenoid, 1)
+        # GPIO.output(pin_solenoid, 1)
 
-        while GPIO.input(pin_pintuBuka) == 0:
-            motorStart('FORWARD')
+        # while GPIO.input(pin_pintuBuka) == 0:
+        #     motorStart('FORWARD')
         
         print('Pintu terbuka')
 
     elif kondisi == 'Tutup':
         print('Pintu ditutup')
 
-        while GPIO.input(pin_pintuTutup) == 0:
-            motorStart('REVERSE')
+        # while GPIO.input(pin_pintuTutup) == 0:
+        #     motorStart('REVERSE')
  
-        GPIO.output(pin_solenoid, 0)
+        # GPIO.output(pin_solenoid, 0)
         print('Pintu tertutup')
         
     motorStop(1) 
 
+def servoMove(channel, degree):
+    if degree < 0:
+        print('Range terlalu kecil!')
+        # kit.servo[channel].angle = 0
+
+    elif degree < 0:
+        print('Range terlalu besar!')
+        # kit.servo[channel].angle = 180
+    
+    else:
+        print('Servo', channel, ':', degree, + '°')
+        # kit.servo[channel].angle = degree
+
 def teleBot(msg):
     global Quit
-    global servoX_Degree
-    global servoY_Degree
+    global QuitFlag
     global imgRGB
     global chat_id
     global command
     global teleBot_PWD
-    
-    QuitFlag = False
+    global servoX_Degree
+    global servoY_Degree
+
     chat_id = msg['chat']['id']
     command = msg['text']
 
@@ -248,7 +266,7 @@ def teleBot(msg):
     print('Command   : ', command)
 
     show_keyboard = {'keyboard':[	[  'Ambil Foto',     '^',  'Foto Terakhir'], 
-                                    [      '<',   'Reset Position',   '>'     ],
+                                    [      '<',   'Reset Servo',   '>'     ],
                                     ['Waktu Sekarang',   'v',   'Stop Sistem' ]
                             ]}
 
@@ -266,6 +284,7 @@ def teleBot(msg):
     elif command != teleBot_PWD and QuitFlag == True:
         bot.sendMessage(chat_id, str('Password Salah!'))
         QuitFlag = False
+
     elif command == 'Ambil Foto':
         saveImage(imgRGB)
         sendImage(chat_id)
@@ -281,20 +300,38 @@ def teleBot(msg):
 
     elif command == '^':
         servoY_Degree -= 5
-        kit.servo[0].angle = servoY_Degree
+        servoMove(0, servoY_Degree)
+        txt = str('Servo Y :' + str(servoY_Degree) + '°')
+        bot.sendMessage(chat_id, txt)
 
     elif command == 'v':
         servoY_Degree += 5
-        kit.servo[0].angle = servoY_Degree
+        servoMove(0, servoY_Degree)
+        txt = str('Servo Y :' + str(servoY_Degree) + '°')
+        bot.sendMessage(chat_id, txt)
 
     elif command == '<':
         servoX_Degree -= 5
-        kit.servo[1].angle = servoX_Degree
+        servoMove(1, servoX_Degree)
+        txt = str('Servo X :' + str(servoX_Degree) + '°')
+        bot.sendMessage(chat_id, txt)
 
     elif command == '>':
         servoX_Degree += 5
-        kit.servo[1].angle = servoX_Degree
+        servoMove(1, servoX_Degree)
+        txt = str('Servo X :' + str(servoX_Degree) + '°')
+        bot.sendMessage(chat_id, txt)
     
+    elif command == 'Reset Servo':
+        servoX_Degree = 90
+        servoY_Degree = 90
+        servoMove(1, servoX_Degree)
+        servoMove(0, servoY_Degree)
+        value1 = str('Servo X :' + str(servoX_Degree) + '°\n')
+        value2 = str('Servo Y :' + str(servoY_Degree) + '°')
+        txt = value1 + value2
+        bot.sendMessage(chat_id, txt)
+
     else:
         bot.sendMessage(chat_id, str('Input belum tersedia!'))
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) 
@@ -360,22 +397,22 @@ def detectFace():
                 if cX < faceSize[0]:
                     imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kiri!'), (15, 50), font, 0.7, (54, 67, 244), 2)
                     servoX_Degree += 1
-                    kit.servo[1].angle = servoX_Degree
+                    servoMove(1, servoX_Degree)
             
                 elif cX > faceSize[1]:
                     imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kanan!'), (15, 75), font, 0.7, (54, 67, 244), 2)
                     servoX_Degree -= 1
-                    kit.servo[1].angle = servoX_Degree
+                    servoMove(1, servoX_Degree)
                     
                 if cY < faceSize[2]:
                     imgRGB = cv2.putText(imgRGB, str('Wajah terlalu atas!'), (15, 50), font, 0.7, (54, 67, 244), 2)
                     servoY_Degree -= 1
-                    kit.servo[0].angle = servoY_Degree
+                    servoMove(0, servoY_Degree)
                     
                 elif cY > faceSize[3]:
                     imgRGB = cv2.putText(imgRGB, str('Wajah terlalu bawah!'), (15, 75), font, 0.7, (54, 67, 244), 2)
                     servoY_Degree += 1
-                    kit.servo[0].angle = servoY_Degree
+                    servoMove(0, servoY_Degree)
                 
                 if confidence >= 80 and confidence <= 100:
                     nameID = names[Id]
@@ -445,21 +482,21 @@ def detectFace():
                         txt = txt + Date + Time
                         bot.sendMessage(chat_id, str(txt))
 
-                        while countPintuTerbuka < waktuPintuTerbuka:
-                            if GPIO.input(pin_sensorPIR) == 1:
-                                print('Anda sudah masuk') 
-                                break
+                        # while countPintuTerbuka < waktuPintuTerbuka:
+                        #     if GPIO.input(pin_sensorPIR) == 1:
+                        #         print('Anda sudah masuk') 
+                        #         break
 
-                            if countPintuTerbuka < 3:
-                                print('Pintu sudah terbuka, silakan masuk')
+                        #     if countPintuTerbuka < 3:
+                        #         print('Pintu sudah terbuka, silakan masuk')
 
-                            else:
-                                timerPintu = waktuPintuTerbuka - countPintuTerbuka
-                                print('Mohon segera masuk')
-                                print('Pintu akan ditutup dalam waktu ', timerPintu, 'detik')
+                        #     else:
+                        #         timerPintu = waktuPintuTerbuka - countPintuTerbuka
+                        #         print('Mohon segera masuk')
+                        #         print('Pintu akan ditutup dalam waktu ', timerPintu, 'detik')
 
-                            countPintuTerbuka += 1   
-                            time.sleep(1)
+                        #     countPintuTerbuka += 1   
+                        #     time.sleep(1)
                             
                         if countPintuTerbuka == waktuPintuTerbuka:
                             print('Anda tidak segera masuk')
@@ -508,13 +545,13 @@ finally:
     cam.release()
     cv2.destroyAllWindows()
 
-    if GPIO.input(pin_pintuTutup) == 0:
-        time.sleep(0.5)
+    # if GPIO.input(pin_pintuTutup) == 0:
+    #     time.sleep(0.5)
 
-        while GPIO.input(pin_pintuTutup) == 0:
-            motorStart('CLOSE') 
+    #     while GPIO.input(pin_pintuTutup) == 0:
+    #         motorStart('CLOSE') 
 
     motorStop(1) 
-    kit.servo[0].angle = 90
-    kit.servo[1].angle = 90
-    GPIO.cleanup()
+    servoMove(0, 90)
+    servoMove(0, 90)
+    # GPIO.cleanup()
