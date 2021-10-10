@@ -41,7 +41,7 @@ cam.set(4, rgbHeight)
 
 servoX_Degree = 90
 servoY_Degree = 90
-faceSize = [250, 390, 170, 310]
+facePosition = [250, 390, 170, 310]
 
 # i2c_bus = busio.I2C(SCL, SDA)
 # pca = PCA9685(i2c_bus)
@@ -109,6 +109,7 @@ month = {
     'Nov' : 'Nopember',
     'Dec' : 'Desember'
 }
+
 # GPIO.setmode(GPIO.BCM)
 # GPIO.setup(pin_sensorPIR, GPIO.IN)
 # GPIO.setup(pin_pintuBuka, GPIO.IN)
@@ -128,7 +129,6 @@ def Selisih(current, prev):
         num += 60
 
     num = round(num, 3)
-
     return num
 
 def getCurrent(data):
@@ -137,11 +137,11 @@ def getCurrent(data):
     now = datetime.datetime.now()
     
     if data == 'DATE':
-        day   = day[now.strftime('%a')]
-        month = month[now.strftime('%b')]
+        dayNow   = day[now.strftime('%a')]
+        monthNow = month[now.strftime('%b')]
         date  = now.strftime('%d')
         year  = now.strftime('%Y')
-        value = str(day + ',' + date + month + year)
+        value = f'{dayNow}, {date} {monthNow} {year}'
 
     elif data == 'Date':
         value = now.strftime('%Y%m%d%H%M%S')
@@ -166,16 +166,16 @@ def saveImage(img):
     date = getCurrent('DATE')
     time = getCurrent('Time')
     waktu = getCurrent('Date')
-    img = cv2.putText(img, str(time), (15, 447), font, 0.5, (54, 67, 244), 2)
-    img = cv2.putText(img, str(date), (15, 462), font, 0.5, (54, 67, 244), 2)
-    namaFile = 'Snapshot.' + str(waktu) + '.jpg'
+    img = cv2.putText(img, time, (15, 447), font, 0.5, (54, 67, 244), 2)
+    img = cv2.putText(img, date, (15, 462), font, 0.5, (54, 67, 244), 2)
+    namaFile = 'Snapshot.' + waktu + '.jpg'
     cv2.imwrite(userDir + '/' + namaFile, img)
 
 def sendImage(chatId):
     file = os.listdir(userDir)
     lastImage = sorted(file, key = lambda x: os.path.splitext(x)[0])
     foto = lastImage[-1]
-    file = str(userDir) + '/' + str(foto)
+    file = userDir + '/' + foto
     bot.sendPhoto(chatId, photo=open(file, 'rb'))
 
 def motorSpeed(begin, end, step, accel):    
@@ -274,13 +274,12 @@ def servoMove(channel, degree):
         print('Range terlalu kecil!')
         # kit.servo[channel].angle = 0
 
-    elif degree < 0:
+    elif degree > 180:
         print('Range terlalu besar!')
         # kit.servo[channel].angle = 180
     
     else:
-        pass
-        # print('Servo', str(channel), ':', str(degree), + '°')
+        print(f'Servo {channel} : {degree}°')
         # kit.servo[channel].angle = degree
 
 def teleBot(msg):
@@ -308,15 +307,15 @@ def teleBot(msg):
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard)
         
     elif command == 'Stop Sistem':
-        bot.sendMessage(chat_id, str('Masukan PIN untuk stop TeleBot'))
+        bot.sendMessage(chat_id, 'Masukan PIN untuk stop TeleBot')
         QuitFlag = True
 
     elif command == teleBot_PWD:
-        bot.sendMessage(chat_id, str('Sistem Face Recognition terhenti...'))
+        bot.sendMessage(chat_id, 'Sistem Face Recognition terhenti...')
         Quit = True
 
     elif command != teleBot_PWD and QuitFlag == True:
-        bot.sendMessage(chat_id, str('Password Salah!'))
+        bot.sendMessage(chat_id, 'Password Salah!')
         QuitFlag = False
 
     elif command == 'Ambil Foto':
@@ -329,31 +328,31 @@ def teleBot(msg):
     elif command == 'Waktu Sekarang':
         value1 = getCurrent('TIME')
         value2 = getCurrent('DATE')
-        txt = str('Time : ' + value1 + '\n') + str('Date : ' + value2 + '\n')
+        txt = f'Time: {value1}\nDate: {value2}'
         bot.sendMessage(chat_id, txt)
 
     elif command == '^':
         servoY_Degree -= 5
         servoMove(0, servoY_Degree)
-        txt = str('Servo Y :' + str(servoY_Degree) + '°')
+        txt = f'Servo Y: {servoY_Degree}°'
         bot.sendMessage(chat_id, txt)
 
     elif command == 'v':
         servoY_Degree += 5
         servoMove(0, servoY_Degree)
-        txt = str('Servo Y :' + str(servoY_Degree) + '°')
+        txt = f'Servo Y: {servoY_Degree}°'
         bot.sendMessage(chat_id, txt)
 
     elif command == '<':
         servoX_Degree -= 5
         servoMove(1, servoX_Degree)
-        txt = str('Servo X :' + str(servoX_Degree) + '°')
+        txt = f'Servo X: {servoX_Degree}°'
         bot.sendMessage(chat_id, txt)
 
     elif command == '>':
         servoX_Degree += 5
         servoMove(1, servoX_Degree)
-        txt = str('Servo X :' + str(servoX_Degree) + '°')
+        txt = f'Servo X: {servoX_Degree}°'
         bot.sendMessage(chat_id, txt)
     
     elif command == 'Reset Servo':
@@ -361,13 +360,13 @@ def teleBot(msg):
         servoY_Degree = 90
         servoMove(1, servoX_Degree)
         servoMove(0, servoY_Degree)
-        value1 = str('Servo X :' + str(servoX_Degree) + '°\n')
-        value2 = str('Servo Y :' + str(servoY_Degree) + '°')
+        value1 = f'Servo X: {servoX_Degree}°\n'
+        value2 = f'Servo Y: {servoY_Degree}°'
         txt = value1 + value2
         bot.sendMessage(chat_id, txt)
 
     else:
-        bot.sendMessage(chat_id, str('Input belum tersedia!'))
+        bot.sendMessage(chat_id, 'Input belum tersedia!')
         bot.sendMessage(chat_id, 'Silakan pilih perintah:', reply_markup=show_keyboard) 
 
 def detectFace():
@@ -416,35 +415,35 @@ def detectFace():
             Id, confidence = faceRecognizer.predict(imgGray[y1:y1+h1, x1:x1+w1])
             
             if jumlahWajah == 0:
-                imgRGB = cv2.putText(imgRGB, str('Tidak ada Wajah'), (15, 50), font, 0.7, (54, 67, 244), 2)
+                imgRGB = cv2.putText(imgRGB, 'Tidak ada Wajah', (15, 50), font, 0.7, (54, 67, 244), 2)
 
             elif jumlahWajah > 1:
-                imgRGB = cv2.putText(imgRGB, str('Wajah lebih dari satu!'), (15, 50), font, 0.7, (54, 67, 244), 2)
+                imgRGB = cv2.putText(imgRGB, 'Wajah lebih dari satu!', (15, 50), font, 0.7, (54, 67, 244), 2)
             
             elif jumlahWajah == 1:
                 if w1 <= jarakWajah[0] :
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu jauh!'), (15, 25), font, 0.7, (41, 50, 183), 2)
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu jauh!', (15, 25), font, 0.7, (41, 50, 183), 2)
                 
                 elif w1 >= jarakWajah[1]:
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu dekat!'), (15, 25), font, 0.7, (41, 50, 183), 2)
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu dekat!', (15, 25), font, 0.7, (41, 50, 183), 2)
 
-                if cX < faceSize[0]:
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kiri!'), (15, 50), font, 0.7, (54, 67, 244), 2)
+                if cX < facePosition[0]:
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu kiri!', (15, 50), font, 0.7, (54, 67, 244), 2)
                     servoX_Degree += 1
                     servoMove(1, servoX_Degree)
             
-                elif cX > faceSize[1]:
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu kanan!'), (15, 75), font, 0.7, (54, 67, 244), 2)
+                elif cX > facePosition[1]:
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu kanan!', (15, 75), font, 0.7, (54, 67, 244), 2)
                     servoX_Degree -= 1
                     servoMove(1, servoX_Degree)
                     
-                if cY < faceSize[2]:
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu atas!'), (15, 50), font, 0.7, (54, 67, 244), 2)
+                if cY < facePosition[2]:
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu atas!', (15, 50), font, 0.7, (54, 67, 244), 2)
                     servoY_Degree -= 1
                     servoMove(0, servoY_Degree)
                     
-                elif cY > faceSize[3]:
-                    imgRGB = cv2.putText(imgRGB, str('Wajah terlalu bawah!'), (15, 75), font, 0.7, (54, 67, 244), 2)
+                elif cY > facePosition[3]:
+                    imgRGB = cv2.putText(imgRGB, 'Wajah terlalu bawah!', (15, 75), font, 0.7, (54, 67, 244), 2)
                     servoY_Degree += 1
                     servoMove(0, servoY_Degree)
                 
@@ -456,8 +455,8 @@ def detectFace():
                     nameID = names[0]
                     confidenceTxt = ' {0}%'.format(round(100-confidence))
 
-                imgRGB = cv2.putText(imgRGB, str(nameID), (x2, y2-5), font, 0.7, (145, 202, 19), 2)
-                imgRGB = cv2.putText(imgRGB, str(confidenceTxt), (x2+w2-60, y2+h2-5), font, 0.7, (145, 202, 19), 2)
+                imgRGB = cv2.putText(imgRGB, nameID, (x2, y2-5), font, 0.7, (145, 202, 19), 2)
+                imgRGB = cv2.putText(imgRGB, confidenceTxt, (x2+w2-60, y2+h2-5), font, 0.7, (145, 202, 19), 2)
                 
                 if count2 < faceCompare:
                     detectResult[count2] = names.index(nameID)
@@ -501,9 +500,9 @@ def detectFace():
 
                         txt = 'Wajah tidak dikenali!\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
-                        Time = str('Jam : ' + getCurrent('Time') + '\n')
+                        Time = str('Jam : '     + getCurrent('Time') + '\n')
                         txt = txt + Date + Time
-                        bot.sendMessage(chat_id, str(txt))
+                        bot.sendMessage(chat_id, txt)
 
                     else:
                         sistemPintu('Buka')
@@ -512,9 +511,9 @@ def detectFace():
 
                         txt = 'User ' + faceResult_Now + ' masuk\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
-                        Time = str('Jam : ' + getCurrent('Time') + '\n')
+                        Time = str('Jam : '     + getCurrent('Time') + '\n')
                         txt = txt + Date + Time
-                        bot.sendMessage(chat_id, str(txt))
+                        bot.sendMessage(chat_id, txt)
 
                         # while countPintuTerbuka < waktuPintuTerbuka:
                         #     if GPIO.input(pin_sensorPIR) == 1:
@@ -556,7 +555,7 @@ def detectFace():
                     faceState2 = False
                     print('Tidak Ada Wajah!')
                     txt = 'Tidak ada wajah  terdeteksi dalam 5 detik terakhir'
-                    bot.sendMessage(chat_id, str(txt))
+                    bot.sendMessage(chat_id, txt)
 
 bot = telepot.Bot(tokenBot)
 bot.message_loop(teleBot)
