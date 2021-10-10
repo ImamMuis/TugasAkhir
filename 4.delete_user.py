@@ -1,3 +1,13 @@
+""" 
+Proyek Akhir :  PENERAPAN FACE RECOGNITION UNTUK SISTEM
+                KEAMANAN PINTU RUANGAN BERBASIS
+                KECERDASAN BUATAN 
+Grup         :  7
+Anggota      :  - Iis Lisnawati (Mekanikal & Elektrikal)
+                - Imam Muis Hamzah Harahap (Pemrograman Sistem)
+Cara pakai   :  Jalankan file kemudian ketikkan nama user yang ingin dihapus
+"""
+
 import os
 
 deleteUser = input('Masukkan nama user yang ingin dihapus: ')

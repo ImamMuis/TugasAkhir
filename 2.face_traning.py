@@ -1,3 +1,13 @@
+""" 
+Proyek Akhir :  PENERAPAN FACE RECOGNITION UNTUK SISTEM
+                KEAMANAN PINTU RUANGAN BERBASIS
+                KECERDASAN BUATAN 
+Grup         :  7
+Anggota      :  - Iis Lisnawati (Mekanikal & Elektrikal)
+                - Imam Muis Hamzah Harahap (Pemrograman Sistem)
+Cara pakai   :  Jalankan file lalu tunggu sampai hasil training selesai
+"""
+
 import os
 import cv2
 import numpy as np
