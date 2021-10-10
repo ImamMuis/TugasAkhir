@@ -85,6 +85,30 @@ totalUser = len(names)
 countID = [0] * totalUser
 detectResult = [0] * faceCompare
 
+day = {
+    'Sun' : 'Minggu',
+    'Mon' : 'Senin',
+    'Tue' : 'Selasa',
+    'Wed' : 'Rabu',
+    'Thu' : 'Kamis',
+    'Fri' : 'Jumat',
+    'Sat' : 'Sabtu',
+}
+
+month = {
+    'Jan' : 'Januari',
+    'Feb' : 'Februari',
+    'Mar' : 'Maret',
+    'Apr' : 'April',
+    'Mei' : 'Mei',
+    'Jun' : 'Juni',
+    'Jul' : 'Juli',
+    'Agt' : 'Agustus',
+    'Sep' : 'September',
+    'Oct' : 'Oktober',
+    'Nov' : 'Nopember',
+    'Dec' : 'Desember'
+}
 # GPIO.setmode(GPIO.BCM)
 # GPIO.setup(pin_sensorPIR, GPIO.IN)
 # GPIO.setup(pin_pintuBuka, GPIO.IN)
@@ -108,9 +132,16 @@ def Selisih(current, prev):
     return num
 
 def getCurrent(data):
+    global day
+    global month
     now = datetime.datetime.now()
+    
     if data == 'DATE':
-        value = now.strftime('%a, %d - %b - %Y')
+        day   = day[now.strftime('%a')]
+        month = month[now.strftime('%b')]
+        date  = now.strftime('%d')
+        year  = now.strftime('%Y')
+        value = str(day + ',' + date + month + year)
 
     elif data == 'Date':
         value = now.strftime('%Y%m%d%H%M%S')
@@ -119,7 +150,9 @@ def getCurrent(data):
         value = now.strftime('%H:%M:%S')
 
     elif data == 'Time':
-        value = now.strftime('%H:%M:')
+        Time = now.strftime('%H:%M:%S.')
+        sec = str(round(float(str(now).split(':')[-1]), 3))
+        value = Time + sec.split('.')[-1]
 
     elif data == 'second':
         value = str(round(float(str(now).split(':')[-1]), 3))
@@ -130,9 +163,9 @@ def getCurrent(data):
     return value
 
 def saveImage(img):
-    waktu = getCurrent('Date')
     date = getCurrent('DATE')
-    time = getCurrent('Time') + getCurrent('second')
+    time = getCurrent('Time')
+    waktu = getCurrent('Date')
     img = cv2.putText(img, str(time), (15, 447), font, 0.5, (54, 67, 244), 2)
     img = cv2.putText(img, str(date), (15, 462), font, 0.5, (54, 67, 244), 2)
     namaFile = 'Snapshot.' + str(waktu) + '.jpg'
@@ -246,7 +279,8 @@ def servoMove(channel, degree):
         # kit.servo[channel].angle = 180
     
     else:
-        print('Servo', channel, ':', degree, + '°')
+        pass
+        # print('Servo', str(channel), ':', str(degree), + '°')
         # kit.servo[channel].angle = degree
 
 def teleBot(msg):
@@ -467,7 +501,7 @@ def detectFace():
 
                         txt = 'Wajah tidak dikenali!\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
-                        Time = str('Jam : ' + getCurrent('Time') + getCurrent('second') + '\n')
+                        Time = str('Jam : ' + getCurrent('Time') + '\n')
                         txt = txt + Date + Time
                         bot.sendMessage(chat_id, str(txt))
 
@@ -478,7 +512,7 @@ def detectFace():
 
                         txt = 'User ' + faceResult_Now + ' masuk\n'
                         Date = str('Tanggal : ' + getCurrent('DATE') + '\n')
-                        Time = str('Jam : ' + getCurrent('Time') + getCurrent('second') + '\n')
+                        Time = str('Jam : ' + getCurrent('Time') + '\n')
                         txt = txt + Date + Time
                         bot.sendMessage(chat_id, str(txt))
 
@@ -544,13 +578,7 @@ except KeyboardInterrupt:
 finally:
     cam.release()
     cv2.destroyAllWindows()
-
-    # if GPIO.input(pin_pintuTutup) == 0:
-    #     time.sleep(0.5)
-
-    #     while GPIO.input(pin_pintuTutup) == 0:
-    #         motorStart('CLOSE') 
-
+    setupPintu()
     motorStop(1) 
     servoMove(0, 90)
     servoMove(0, 90)
