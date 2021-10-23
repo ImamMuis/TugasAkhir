@@ -11,9 +11,8 @@ Cara pakai   :  Jalankan file kemudian ketikkan nama user yang ingin didaftarkan
 import cv2
 
 newUser = input('Masukkan nama user baru: ')
-
-cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-resolution = 480 #pixel
+cam = cv2.VideoCapture(0)
+resolution = 480
 
 ratio = 4 / 3
 rgbHeight = resolution
@@ -24,9 +23,10 @@ count1 = 0
 count2 = 0
 faceSample = 30
 faceIDFlag = True
-userDir = 'dataset'
-fileUser = 'data/Username.txt'
-cascadePath = 'data/haarcascade_frontalface_default.xml'
+root = '/home/pi/1.TugasAkhir/'
+userDir = root + 'dataset'
+fileUser = root + 'data/Username.txt'
+cascadePath = root + 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 
 with open(fileUser) as user:
@@ -72,7 +72,7 @@ while True:
                 
                 if jumlahWajah == 1:
                     count1 += 1
-                    namafileUser = 'User.' + str(faceID) + '.' + str(count1) + '.jpg'
+                    namafileUser = f'User.{faceID}.{count}.jpg'
                     cv2.imwrite(userDir + '/' + namafileUser, imgGray[y:y+h, x:x+w])
 
             cv2.imshow('Pengambilan Dataset Wajah', imgRGB)

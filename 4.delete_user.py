@@ -13,8 +13,9 @@ import os
 deleteUser = input('Masukkan nama user yang ingin dihapus: ')
 userID = 0
 jumlahGambar = 30
-userDir = 'dataset'
-fileUser = 'data/Username.txt'
+root = '/home/pi/1.TugasAkhir/'
+userDir = root + 'dataset'
+fileUser = root + 'data/Username.txt'
 
 with open(fileUser) as user:
     names = user.read().splitlines()

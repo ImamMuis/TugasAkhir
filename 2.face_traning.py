@@ -5,7 +5,7 @@ Proyek Akhir :  PENERAPAN FACE RECOGNITION UNTUK SISTEM
 Grup         :  7
 Anggota      :  - Iis Lisnawati (Mekanikal & Elektrikal)
                 - Imam Muis Hamzah Harahap (Pemrograman Sistem)
-Cara pakai   :  Jalankan file lalu tunggu sampai hasil training selesai
+Cara pakai   :  Jalankan file kemudian tunggu sampai proses training selesai
 """
 
 import os
@@ -13,8 +13,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
-userDir = 'dataset'
-cascadePath = 'data/haarcascade_frontalface_default.xml'
+root = ''
+userDir = root + 'dataset'
+cascadePath = root + 'data/haarcascade_frontalface_default.xml'
 faceDetector = cv2.CascadeClassifier(cascadePath)
 faceRecognizer = cv2.face.LBPHFaceRecognizer_create()
 
@@ -31,10 +32,9 @@ def getImagesLabel(path):
 		for x, y, w, h in faces:
 			faceSamples.append(img_numpy[y:y+h, x:x+w])
 			faceIDs.append(faceID)
-
 	return faceSamples, faceIDs
 
 faces, IDs = getImagesLabel(userDir)
 faceRecognizer.train(faces, np.array(IDs))
-faceRecognizer.write('data/trainer.xml')
-print('Training Dataset Done!')
+faceRecognizer.write(root + 'data/trainer.xml')
+print('Training Dataset selesai!')
